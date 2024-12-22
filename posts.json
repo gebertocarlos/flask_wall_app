@@ -1,0 +1,13 @@
+[
+    {
+        "id": 1,
+        "content": "This is my first post!",
+        "timestamp": "2024-12-22T17:00:00",
+        "comments": [
+            {
+                "content": "well done",
+                "timestamp": "2024-12-22T21:10:38.595750"
+            }
+        ]
+    }
+]

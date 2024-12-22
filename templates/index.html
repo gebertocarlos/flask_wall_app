@@ -5,15 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Wall App</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.0/gsap.min.js"></script>
     <style>
         :root {
             --primary: #4f46e5;
             --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --success: #10b981;
+            --gray-50: #f9fafb;
             --gray-100: #f3f4f6;
             --gray-200: #e5e7eb;
             --gray-300: #d1d5db;
             --gray-600: #4b5563;
             --gray-700: #374151;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        [data-theme="dark"] {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --primary-light: #a5b4fc;
+            --gray-50: #18181b;
+            --gray-100: #27272a;
+            --gray-200: #3f3f46;
+            --gray-300: #52525b;
+            --gray-600: #a1a1aa;
+            --gray-700: #d4d4d8;
         }
 
         * {
@@ -27,15 +47,25 @@
             background-color: var(--gray-100);
             color: var(--gray-700);
             line-height: 1.6;
+            transition: background-color 0.3s ease;
         }
 
         .navbar {
-            background: white;
+            background: var(--gray-50);
             padding: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: var(--shadow);
             position: sticky;
             top: 0;
             z-index: 100;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .container {
@@ -54,12 +84,34 @@
             gap: 0.5rem;
         }
 
+.theme-toggle {
+    background: none;
+    border: none;
+    color: var(--gray-600);
+    cursor: pointer;
+    padding: 1rem; /* Increased padding for a larger button */
+    border-radius: 1rem; /* Rounded corners */
+    transition: all 0.2s ease;
+    font-size: 1.5rem; /* Larger font size for the icon */
+}
+
+.theme-toggle:hover {
+    background: var(--gray-100);
+    color: var(--primary);
+}
+
         .post-form {
-            background: white;
-            border-radius: 12px;
+            background: var(--gray-50);
+            border-radius: 1rem;
             padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow-md);
             margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .post-form:focus-within {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
         }
 
         .post-form textarea {
@@ -67,11 +119,13 @@
             min-height: 120px;
             padding: 1rem;
             border: 2px solid var(--gray-200);
-            border-radius: 8px;
+            border-radius: 0.75rem;
             font-size: 1rem;
             resize: none;
             margin-bottom: 1rem;
-            transition: border-color 0.2s;
+            background: var(--gray-50);
+            color: var(--gray-700);
+            transition: all 0.2s ease;
         }
 
         .post-form textarea:focus {
@@ -84,10 +138,10 @@
             color: white;
             border: none;
             padding: 0.75rem 1.5rem;
-            border-radius: 8px;
+            border-radius: 0.75rem;
             font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
@@ -95,14 +149,23 @@
 
         .btn:hover {
             background: var(--primary-dark);
+            transform: translateY(-1px);
         }
 
         .post {
-            background: white;
-            border-radius: 12px;
+            background: var(--gray-50);
+            border-radius: 1rem;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .post:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         .post-content {
@@ -119,17 +182,37 @@
             font-size: 0.9rem;
         }
 
+        .post-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
         .comments {
             margin-top: 1.5rem;
             padding-top: 1.5rem;
             border-top: 1px solid var(--gray-200);
+            display: none;
+        }
+
+        .comments.visible {
+            display: block;
+            animation: slideDown 0.3s ease;
         }
 
         .comment {
             background: var(--gray-100);
             padding: 1rem;
-            border-radius: 8px;
+            border-radius: 0.75rem;
             margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .comment:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
         }
 
         .comment-form {
@@ -141,10 +224,13 @@
             min-height: 80px;
             padding: 0.75rem;
             border: 2px solid var(--gray-200);
-            border-radius: 8px;
+            border-radius: 0.75rem;
             font-size: 0.95rem;
             resize: none;
             margin-bottom: 0.75rem;
+            background: var(--gray-50);
+            color: var(--gray-700);
+            transition: all 0.2s ease;
         }
 
         .comment-form textarea:focus {
@@ -152,30 +238,94 @@
             border-color: var(--primary);
         }
 
-        .section-title {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .action-btn {
+            background: none;
+            border: none;
             color: var(--gray-600);
-            margin-bottom: 1rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .action-btn:hover {
+            color: var(--primary);
+            background: var(--gray-100);
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(1rem);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .scroll-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .post, .post-form {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
     <nav class="navbar">
-        <div class="container">
+        <div class="navbar-content">
             <a href="/" class="brand">
                 <i class="fas fa-comments"></i>
                 Wall App
             </a>
+            <button class="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </nav>
 
     <main class="container">
         <div class="post-form">
-            <form action="/post" method="POST">
-                <textarea 
-                    name="content" 
+            <form id="postForm">
+                <textarea
+                    name="content"
+                    id="postContent"
                     placeholder="What's on your mind?"
                     required
                 ></textarea>
@@ -186,35 +336,177 @@
             </form>
         </div>
 
-        {% for post in posts %}
-        <article class="post">
-            <p class="post-content">{{ post.content }}</p>
-            <div class="post-footer">
-                <span><i class="far fa-comment"></i> {{ post.comments|length }} comments</span>
-            </div>
-
-            <div class="comments">
-                <h3 class="section-title">Comments</h3>
-                {% for comment in post.comments %}
-                <div class="comment">
-                    <p>{{ comment.content }}</p>
-                </div>
-                {% endfor %}
-
-                <form class="comment-form" action="/post/{{ post.id }}" method="POST">
-                    <textarea 
-                        name="content" 
-                        placeholder="Write a comment..."
-                        required
-                    ></textarea>
-                    <button type="submit" class="btn">
-                        <i class="fas fa-reply"></i>
-                        Comment
-                    </button>
-                </form>
-            </div>
-        </article>
+        <div id="postsContainer">
+<!-- Inside the for loop for posts -->
+{% for post in posts %}
+<article class="post" id="post-{{ post.id }}">
+    <p class="post-content">{{ post.content }}</p>
+    <div class="post-footer">
+        <div class="post-meta">
+            <i class="far fa-clock"></i>
+            <span>{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
+        </div>
+        <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
+            <i class="far fa-comment"></i>
+            <span>{{ post.comments|length }} comments</span>
+        </button>
+    </div>
+    <div class="comments" id="comments-{{ post.id }}">
+        {% for comment in post.comments %}
+        <div class="comment">
+            <p>{{ comment.content }}</p>
+        </div>
         {% endfor %}
+        <form class="comment-form" data-post-id="{{ post.id }}">
+            <textarea
+                name="content"
+                placeholder="Write a comment..."
+                required
+            ></textarea>
+            <button type="submit" class="btn">
+                <i class="fas fa-reply"></i>
+                Comment
+            </button>
+        </form>
+    </div>
+</article>
+{% endfor %}
+        </div>
     </main>
+
+    <button class="scroll-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <script>
+        // Theme Toggle and other code remains the same
+
+        // Comment Toggle
+        const toggleComments = (commentsId) => {
+            const commentsSection = document.getElementById(commentsId);
+            commentsSection.classList.toggle('visible');
+        };
+
+        // Handle Post Form submission
+        document.getElementById('postForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const content = document.getElementById('postContent').value;
+
+            fetch('/create_post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const newPost = document.createElement('article');
+                    newPost.classList.add('post');
+                    newPost.id = `post-${data.post.id}`;
+                    newPost.innerHTML = `
+    <p class="post-content">${data.post.content}</p>
+    <div class="post-footer">
+        <div class="post-meta">
+            <i class="far fa-clock"></i>
+            <span>${data.post.timestamp}</span>
+        </div>
+        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+            <i class="far fa-comment"></i>
+            <span>0 comments</span>
+        </button>
+    </div>
+    <div class="comments" id="comments-${data.post.id}">
+        <!-- Comments will be appended here -->
+    </div>
+    <form class="comment-form" data-post-id="${data.post.id}">
+        <textarea
+            name="content"
+            placeholder="Write a comment..."
+            required
+        ></textarea>
+        <button type="submit" class="btn">
+            <i class="fas fa-reply"></i>
+            Comment
+        </button>
+    </form>
+`;
+                    document.getElementById('postsContainer').prepend(newPost);
+                    document.getElementById('postContent').value = '';  // Clear the textarea
+                }
+            });
+        });
+
+        // Handle Comment Form submission
+        // Handle Comment Form submission
+document.querySelectorAll('.comment-form').forEach(form => {
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const postId = form.getAttribute('data-post-id');
+        const content = form.querySelector('textarea').value;
+
+        fetch(`/add_comment/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ content })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const newComment = document.createElement('div');
+                newComment.classList.add('comment');
+                newComment.innerHTML = `<p>${data.comment.content}</p>`;
+
+                const commentsSection = document.getElementById(`comments-${postId}`);
+                // Insert the new comment before the comment form
+                const commentForm = commentsSection.querySelector('.comment-form');
+                commentsSection.insertBefore(newComment, commentForm);
+
+                form.querySelector('textarea').value = '';  // Clear the textarea
+            }
+        });
+    });
+});
+// Theme Toggle
+const themeToggleButton = document.querySelector('.theme-toggle');
+const rootElement = document.documentElement;
+
+// Check and set initial theme from localStorage
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    rootElement.setAttribute('data-theme', savedTheme);
+    updateThemeToggleIcon(savedTheme);
+} else {
+    // Default to light theme if no preference is saved
+    rootElement.setAttribute('data-theme', 'light');
+}
+
+themeToggleButton.addEventListener('click', () => {
+    // Get current theme
+    const currentTheme = rootElement.getAttribute('data-theme');
+    // Toggle between 'dark' and 'light'
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    rootElement.setAttribute('data-theme', newTheme);
+    // Save the new theme to localStorage
+    localStorage.setItem('theme', newTheme);
+    // Update the theme toggle icon
+    updateThemeToggleIcon(newTheme);
+});
+
+function updateThemeToggleIcon(theme) {
+    const icon = themeToggleButton.querySelector('i');
+    if (theme === 'dark') {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+    } else {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+    }
+}
+
+    </script>
 </body>
 </html>
