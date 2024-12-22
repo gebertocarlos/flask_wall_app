@@ -26,8 +26,7 @@ posts = load_posts()
 @app.route('/')
 def home():
     # Load the posts from the JSON file
-    with open('posts.json', 'r') as f:
-        posts = json.load(f)
+    posts = load_posts()
     
     # Convert string timestamps back to datetime objects
     for post in posts:
@@ -35,8 +34,9 @@ def home():
         for comment in post['comments']:
             comment['timestamp'] = datetime.fromisoformat(comment['timestamp'])
     
-    # Sort posts by timestamp in descending order
+    # Sort posts by timestamp in descending order (newest first)
     sorted_posts = sorted(posts, key=lambda post: post['timestamp'], reverse=True)
+    
     return render_template('index.html', posts=sorted_posts)
 
 @app.route('/create_post', methods=['POST'])
