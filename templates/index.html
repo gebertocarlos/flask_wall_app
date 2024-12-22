@@ -344,7 +344,7 @@
     <div class="post-footer">
         <div class="post-meta">
             <i class="far fa-clock"></i>
-            <span>{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
+            <span>{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') if post.timestamp else 'No timestamp available' }}</span>
         </div>
         <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
             <i class="far fa-comment"></i>
