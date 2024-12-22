@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wall App</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #4338ca;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-700);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: white;
+            padding: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .post-form {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .post-form textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            resize: none;
+            margin-bottom: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .post-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .post {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .post-content {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--gray-700);
+        }
+
+        .post-footer {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--gray-600);
+            font-size: 0.9rem;
+        }
+
+        .comments {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .comment {
+            background: var(--gray-100);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .comment-form {
+            margin-top: 1rem;
+        }
+
+        .comment-form textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 0.75rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            resize: none;
+            margin-bottom: 0.75rem;
+        }
+
+        .comment-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .section-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="/" class="brand">
+                <i class="fas fa-comments"></i>
+                Wall App
+            </a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="post-form">
+            <form action="/post" method="POST">
+                <textarea 
+                    name="content" 
+                    placeholder="What's on your mind?"
+                    required
+                ></textarea>
+                <button type="submit" class="btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Share Post
+                </button>
+            </form>
+        </div>
+
+        {% for post in posts %}
+        <article class="post">
+            <p class="post-content">{{ post.content }}</p>
+            <div class="post-footer">
+                <span><i class="far fa-comment"></i> {{ post.comments|length }} comments</span>
+            </div>
+
+            <div class="comments">
+                <h3 class="section-title">Comments</h3>
+                {% for comment in post.comments %}
+                <div class="comment">
+                    <p>{{ comment.content }}</p>
+                </div>
+                {% endfor %}
+
+                <form class="comment-form" action="/post/{{ post.id }}" method="POST">
+                    <textarea 
+                        name="content" 
+                        placeholder="Write a comment..."
+                        required
+                    ></textarea>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-reply"></i>
+                        Comment
+                    </button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </main>
+</body>
+</html>
