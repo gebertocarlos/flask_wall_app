@@ -81,10 +81,11 @@ def add_comment(post_id):
                 'content': content,
                 'timestamp': datetime.now()
             }
-            post['comments'].insert(0, new_comment)  # Add new comment at the beginning
+            post['comments'].append(new_comment)  # Yorum en sona ekleniyor
+            post['comments'] = sorted(post['comments'], key=lambda c: c['timestamp'], reverse=True)  # Yeniden eskiye sıralama
             save_posts(posts)
             
-            # Create a response version with string timestamp
+            # Geri dönüş için okunabilir zaman formatı ekleme
             response_comment = {
                 **new_comment,
                 'timestamp': new_comment['timestamp'].strftime('%B %d, %Y at %I:%M %p')
