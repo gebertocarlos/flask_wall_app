@@ -382,66 +382,14 @@
         // Theme Toggle and other code remains the same
 
         // Comment Toggle
-        const toggleComments = (commentsId) => {
-            const commentsSection = document.getElementById(commentsId);
-            commentsSection.classList.toggle('visible');
-        };
+// Comment Toggle
+const toggleComments = (commentsId) => {
+    const commentsSection = document.getElementById(commentsId);
+    commentsSection.classList.toggle('visible');
+};
 
-        // Handle Post Form submission
-        document.getElementById('postForm').addEventListener('submit', (event) => {
-            event.preventDefault();
-            const content = document.getElementById('postContent').value;
-
-            fetch('/create_post', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const newPost = document.createElement('article');
-                    newPost.classList.add('post');
-                    newPost.id = `post-${data.post.id}`;
-                    newPost.innerHTML = `
-    <p class="post-content">${data.post.content}</p>
-    <div class="post-footer">
-        <div class="post-meta">
-            <i class="far fa-clock"></i>
-            <span>${data.post.timestamp}</span>
-        </div>
-        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-            <i class="far fa-comment"></i>
-            <span>0 comments</span>
-        </button>
-    </div>
-    <div class="comments" id="comments-${data.post.id}">
-        <!-- Comments will be appended here -->
-    </div>
-    <form class="comment-form" data-post-id="${data.post.id}">
-        <textarea
-            name="content"
-            placeholder="Write a comment..."
-            required
-        ></textarea>
-        <button type="submit" class="btn">
-            <i class="fas fa-reply"></i>
-            Comment
-        </button>
-    </form>
-`;
-document.getElementById('postsContainer').prepend(newPost);
-
-                    document.getElementById('postContent').value = '';  // Clear the textarea
-                }
-            });
-        });
-
-        // Handle Comment Form submission
-        // Handle Comment Form submission
-document.querySelectorAll('.comment-form').forEach(form => {
+// Attach comment form handler
+const attachCommentFormHandler = (form) => {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const postId = form.getAttribute('data-post-id');
@@ -466,10 +414,76 @@ document.querySelectorAll('.comment-form').forEach(form => {
                 const commentForm = commentsSection.querySelector('.comment-form');
                 commentsSection.insertBefore(newComment, commentForm);
 
+                // Update comment count
+                const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
+                const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
+                commentButton.textContent = `${currentCount + 1} comments`;
+
                 form.querySelector('textarea').value = '';  // Clear the textarea
             }
         });
     });
+};
+
+// Handle Post Form submission
+document.getElementById('postForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const content = document.getElementById('postContent').value;
+
+    fetch('/create_post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const newPost = document.createElement('article');
+            newPost.classList.add('post');
+            newPost.id = `post-${data.post.id}`;
+            newPost.innerHTML = `
+                <p class="post-content">${data.post.content}</p>
+                <div class="post-footer">
+                    <div class="post-meta">
+                        <i class="far fa-clock"></i>
+                        <span>${data.post.timestamp}</span>
+                    </div>
+                    <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                        <i class="far fa-comment"></i>
+                        <span>0 comments</span>
+                    </button>
+                </div>
+                <div class="comments" id="comments-${data.post.id}">
+                    <form class="comment-form" data-post-id="${data.post.id}">
+                        <textarea
+                            name="content"
+                            placeholder="Write a comment..."
+                            required
+                        ></textarea>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-reply"></i>
+                            Comment
+                        </button>
+                    </form>
+                </div>
+            `;
+
+            document.getElementById('postsContainer').prepend(newPost);
+            
+            // Attach event handler to the new post's comment form
+            const newCommentForm = newPost.querySelector('.comment-form');
+            attachCommentFormHandler(newCommentForm);
+
+            document.getElementById('postContent').value = '';  // Clear the textarea
+        }
+    });
+});
+
+// Attach handlers to existing comment forms
+document.querySelectorAll('.comment-form').forEach(form => {
+    attachCommentFormHandler(form);
 });
 // Theme Toggle
 const themeToggleButton = document.querySelector('.theme-toggle');
