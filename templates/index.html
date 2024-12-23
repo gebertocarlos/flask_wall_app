@@ -132,6 +132,42 @@
             outline: none;
             border-color: var(--primary);
         }
+        .post-form-toggle {
+    background: none;
+    border: none;
+    color: var(--gray-600);
+    cursor: pointer;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 1.5rem;
+    transition: all 0.2s ease;
+}
+
+.post-form-toggle:hover {
+    background: var(--gray-100);
+    color: var(--primary);
+}
+
+/* Post form visibility */
+.post-form-container {
+    display: none;
+    position: sticky; /* Keep the form visible at the top */
+    top: 1rem;
+    z-index: 110; /* Ensure it stays above other elements */
+    margin-bottom: 1.5rem;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.post-form-container.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.post-form-container.hidden {
+    opacity: 0;
+    transform: translateY(-10px);
+}
 
         .btn {
             background: var(--primary);
@@ -321,21 +357,23 @@
     </nav>
 
     <main class="container">
-        <div class="post-form">
-            <form id="postForm">
-                <textarea 
-                    name="content" 
-                    id="postContent"
-                    placeholder="What's on your mind?"
-                    required
-                ></textarea>
-                <button type="submit" class="btn">
-                    <i class="fas fa-paper-plane"></i>
-                    Share Post
-                </button>
-            </form>
+        <div class="post-form-container hidden" id="postFormContainer">
+            <div class="post-form">
+                <form id="postForm">
+                    <textarea 
+                        name="content" 
+                        id="postContent"
+                        placeholder="What's on your mind?"
+                        required
+                    ></textarea>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Share Post
+                    </button>
+                </form>
+            </div>
         </div>
-
+        
         <div id="postsContainer">
 <!-- Inside the for loop for posts -->
 {% for post in posts %}
@@ -521,7 +559,19 @@ function updateThemeToggleIcon(theme) {
         icon.classList.add('fa-sun');
     }
 }
+const postFormToggleButton = document.querySelector('.post-form-toggle');
+    const postFormContainer = document.getElementById('postFormContainer');
 
+    postFormToggleButton.addEventListener('click', () => {
+        const isVisible = postFormContainer.classList.contains('visible');
+        if (isVisible) {
+            postFormContainer.classList.remove('visible');
+            postFormContainer.classList.add('hidden');
+        } else {
+            postFormContainer.classList.remove('hidden');
+            postFormContainer.classList.add('visible');
+        }
+    });
     </script>
 </body>
 </html>
