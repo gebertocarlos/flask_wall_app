@@ -355,7 +355,7 @@
         <ul>
             {% for comment in post.comments %}
                 <li>
-                    <strong>{{ comment.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</strong>: {{ comment.content }}
+                 {{ comment.content }}
                 </li>
             {% endfor %}
         </ul>
