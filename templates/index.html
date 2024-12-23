@@ -51,30 +51,22 @@
         }
 
         .navbar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    padding: 1rem;
-    background-color: #1e1e1e;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
+            background: var(--gray-50);
+            padding: 1rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: all 0.3s ease;
+        }
 
-.navbar-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-}
-.navbar-buttons {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 1rem;
-}
-
+        .navbar-content {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
         .container {
             max-width: 800px;
@@ -102,22 +94,7 @@
     transition: all 0.2s ease;
     font-size: 1.5rem; /* Larger font size for the icon */
 }
-button.theme-toggle,
-button.post-form-toggle {
-    background-color: #333333;
-    color: #ffffff;
-    border: none;
-    border-radius: 50%;
-    padding: 1rem;
-    cursor: pointer;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-    transition: background-color 0.3s;
-}
 
-button.theme-toggle:hover,
-button.post-form-toggle:hover {
-    background-color: #555555;
-}
 .theme-toggle:hover {
     background: var(--gray-100);
     color: var(--primary);
@@ -155,42 +132,6 @@ button.post-form-toggle:hover {
             outline: none;
             border-color: var(--primary);
         }
-        .post-form-toggle {
-    background: none;
-    border: none;
-    color: var(--gray-600);
-    cursor: pointer;
-    padding: 0.75rem;
-    border-radius: 0.5rem;
-    font-size: 1.5rem;
-    transition: all 0.2s ease;
-}
-
-.post-form-toggle:hover {
-    background: var(--gray-100);
-    color: var(--primary);
-}
-
-/* Post form visibility */
-.post-form-container {
-    display: none;
-    position: sticky; /* Keep the form visible at the top */
-    top: 1rem;
-    z-index: 110; /* Ensure it stays above other elements */
-    margin-bottom: 1.5rem;
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-
-.post-form-container.visible {
-    display: block;
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.post-form-container.hidden {
-    opacity: 0;
-    transform: translateY(-10px);
-}
 
         .btn {
             background: var(--primary);
@@ -373,36 +314,28 @@ button.post-form-toggle:hover {
                 <i class="fas fa-comments"></i>
                 Wall App
             </a>
-            <div class="navbar-buttons">
-                <button class="theme-toggle" aria-label="Toggle theme">
-                    <i class="fas fa-moon"></i>
-                </button>
-                <button class="post-form-toggle" aria-label="Toggle post form">
-                    <i class="fas fa-edit"></i>
-                </button>
-            </div>
+            <button class="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </nav>
-    
 
     <main class="container">
-        <div class="post-form-container hidden" id="postFormContainer">
-            <div class="post-form">
-                <form id="postForm">
-                    <textarea 
-                        name="content" 
-                        id="postContent"
-                        placeholder="What's on your mind?"
-                        required
-                    ></textarea>
-                    <button type="submit" class="btn">
-                        <i class="fas fa-paper-plane"></i>
-                        Share Post
-                    </button>
-                </form>
-            </div>
+        <div class="post-form">
+            <form id="postForm">
+                <textarea 
+                    name="content" 
+                    id="postContent"
+                    placeholder="What's on your mind?"
+                    required
+                ></textarea>
+                <button type="submit" class="btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Share Post
+                </button>
+            </form>
         </div>
-        
+
         <div id="postsContainer">
 <!-- Inside the for loop for posts -->
 {% for post in posts %}
@@ -449,14 +382,66 @@ button.post-form-toggle:hover {
         // Theme Toggle and other code remains the same
 
         // Comment Toggle
-// Comment Toggle
-const toggleComments = (commentsId) => {
-    const commentsSection = document.getElementById(commentsId);
-    commentsSection.classList.toggle('visible');
-};
+        const toggleComments = (commentsId) => {
+            const commentsSection = document.getElementById(commentsId);
+            commentsSection.classList.toggle('visible');
+        };
 
-// Attach comment form handler
-const attachCommentFormHandler = (form) => {
+        // Handle Post Form submission
+        document.getElementById('postForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const content = document.getElementById('postContent').value;
+
+            fetch('/create_post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const newPost = document.createElement('article');
+                    newPost.classList.add('post');
+                    newPost.id = `post-${data.post.id}`;
+                    newPost.innerHTML = `
+    <p class="post-content">${data.post.content}</p>
+    <div class="post-footer">
+        <div class="post-meta">
+            <i class="far fa-clock"></i>
+            <span>${data.post.timestamp}</span>
+        </div>
+        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+            <i class="far fa-comment"></i>
+            <span>0 comments</span>
+        </button>
+    </div>
+    <div class="comments" id="comments-${data.post.id}">
+        <!-- Comments will be appended here -->
+    </div>
+    <form class="comment-form" data-post-id="${data.post.id}">
+        <textarea
+            name="content"
+            placeholder="Write a comment..."
+            required
+        ></textarea>
+        <button type="submit" class="btn">
+            <i class="fas fa-reply"></i>
+            Comment
+        </button>
+    </form>
+`;
+document.getElementById('postsContainer').prepend(newPost);
+
+                    document.getElementById('postContent').value = '';  // Clear the textarea
+                }
+            });
+        });
+
+        // Handle Comment Form submission
+        // Handle Comment Form submission
+document.querySelectorAll('.comment-form').forEach(form => {
     form.addEventListener('submit', (event) => {
         event.preventDefault();
         const postId = form.getAttribute('data-post-id');
@@ -481,76 +466,10 @@ const attachCommentFormHandler = (form) => {
                 const commentForm = commentsSection.querySelector('.comment-form');
                 commentsSection.insertBefore(newComment, commentForm);
 
-                // Update comment count
-                const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
-                const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
-                commentButton.textContent = `${currentCount + 1} comments`;
-
                 form.querySelector('textarea').value = '';  // Clear the textarea
             }
         });
     });
-};
-
-// Handle Post Form submission
-document.getElementById('postForm').addEventListener('submit', (event) => {
-    event.preventDefault();
-    const content = document.getElementById('postContent').value;
-
-    fetch('/create_post', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ content })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const newPost = document.createElement('article');
-            newPost.classList.add('post');
-            newPost.id = `post-${data.post.id}`;
-            newPost.innerHTML = `
-                <p class="post-content">${data.post.content}</p>
-                <div class="post-footer">
-                    <div class="post-meta">
-                        <i class="far fa-clock"></i>
-                        <span>${data.post.timestamp}</span>
-                    </div>
-                    <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                        <i class="far fa-comment"></i>
-                        <span>0 comments</span>
-                    </button>
-                </div>
-                <div class="comments" id="comments-${data.post.id}">
-                    <form class="comment-form" data-post-id="${data.post.id}">
-                        <textarea
-                            name="content"
-                            placeholder="Write a comment..."
-                            required
-                        ></textarea>
-                        <button type="submit" class="btn">
-                            <i class="fas fa-reply"></i>
-                            Comment
-                        </button>
-                    </form>
-                </div>
-            `;
-
-            document.getElementById('postsContainer').prepend(newPost);
-            
-            // Attach event handler to the new post's comment form
-            const newCommentForm = newPost.querySelector('.comment-form');
-            attachCommentFormHandler(newCommentForm);
-
-            document.getElementById('postContent').value = '';  // Clear the textarea
-        }
-    });
-});
-
-// Attach handlers to existing comment forms
-document.querySelectorAll('.comment-form').forEach(form => {
-    attachCommentFormHandler(form);
 });
 // Theme Toggle
 const themeToggleButton = document.querySelector('.theme-toggle');
@@ -588,19 +507,7 @@ function updateThemeToggleIcon(theme) {
         icon.classList.add('fa-sun');
     }
 }
-const postFormToggleButton = document.querySelector('.post-form-toggle');
-    const postFormContainer = document.getElementById('postFormContainer');
 
-    postFormToggleButton.addEventListener('click', () => {
-        const isVisible = postFormContainer.classList.contains('visible');
-        if (isVisible) {
-            postFormContainer.classList.remove('visible');
-            postFormContainer.classList.add('hidden');
-        } else {
-            postFormContainer.classList.remove('hidden');
-            postFormContainer.classList.add('visible');
-        }
-    });
     </script>
 </body>
 </html>
