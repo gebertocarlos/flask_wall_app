@@ -91,9 +91,12 @@
             color: var(--gray-600);
             cursor: pointer;
             padding: 1rem;
+            /* Increased padding for a larger button */
             border-radius: 1rem;
+            /* Rounded corners */
             transition: all 0.2s ease;
             font-size: 1.5rem;
+            /* Larger font size for the icon */
         }
 
         .theme-toggle:hover {
@@ -283,78 +286,240 @@
 
         .scroll-top:hover {
             background: var(--primary-dark);
+            transform: translateY(-2px);
         }
 
         @keyframes slideDown {
-            0% {
+            from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translateY(-10px);
             }
 
-            100% {
+            to {
                 opacity: 1;
                 transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .post,
+            .post-form {
+                padding: 1rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="navbar">
+    <nav class="navbar">
         <div class="navbar-content">
-            <a href="#" class="brand">
-                <i class="fa-solid fa-comments"></i>
-                WallApp
+            <a href="/" class="brand">
+                <i class="fas fa-comments"></i>
+                Wall App
             </a>
-            <button class="theme-toggle">
-                <i class="fa-solid fa-moon"></i>
+            <button class="theme-toggle" aria-label="Toggle theme">
+                <i class="fas fa-moon"></i>
             </button>
         </div>
-    </div>
-    <div class="container">
+    </nav>
+
+    <main class="container">
         <div class="post-form">
-            <textarea placeholder="What's on your mind?"></textarea>
-            <button class="btn">Post</button>
+            <form id="postForm">
+                <textarea name="content" id="postContent" placeholder="What's on your mind?" required></textarea>
+                <button type="submit" class="btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Share Post
+                </button>
+            </form>
         </div>
-        <div class="post">
-            <div class="post-content">
-                Just a cool post.
-            </div>
-            <div class="post-footer">
-                <button class="action-btn"><i class="fa-solid fa-thumbs-up"></i> Like</button>
-                <button class="action-btn"><i class="fa-solid fa-comment"></i> Comment</button>
-                <button class="action-btn"><i class="fa-solid fa-share"></i> Share</button>
-            </div>
-            <div class="comments">
-                <div class="comment">Great post!</div>
-                <div class="comment">I totally agree.</div>
-                <div class="comment-form">
-                    <textarea placeholder="Add a comment"></textarea>
-                    <button class="btn">Comment</button>
+
+        <div id="postsContainer">
+            <!-- Inside the for loop for posts -->
+            {% for post in posts %}
+            <article class="post" id="post-{{ post.id }}">
+                <p class="post-content">{{ post.content }}</p>
+                <div class="post-footer">
+                    <div class="post-meta">
+                        <i class="far fa-clock"></i>
+                        <span>{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    </div>
+                    <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
+                        <i class="far fa-comment"></i>
+                        <span>{{ post.comments|length }} comments</span>
+                    </button>
                 </div>
-            </div>
+                <div class="comments" id="comments-{{ post.id }}">
+                    {% for comment in post.comments %}
+                    <div class="comment">
+                        <p>{{ comment.content }}</p>
+                    </div>
+                    {% endfor %}
+                    <form class="comment-form" data-post-id="{{ post.id }}">
+                        <textarea name="content" placeholder="Write a comment..." required></textarea>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-reply"></i>
+                            Comment
+                        </button>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
         </div>
-    </div>
-    <div class="scroll-top" id="scrollTopBtn">
-        <i class="fa-solid fa-arrow-up"></i>
-    </div>
+    </main>
+
+    <button class="scroll-top" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
-        document.querySelector('.theme-toggle').addEventListener('click', () => {
-            document.documentElement.toggleAttribute('data-theme', 'dark');
+        // Theme Toggle and other code remains the same
+
+        // Comment Toggle
+        // Comment Toggle
+        const toggleComments = (commentsId) => {
+            const commentsSection = document.getElementById(commentsId);
+            commentsSection.classList.toggle('visible');
+        };
+
+        // Attach comment form handler
+        const attachCommentFormHandler = (form) => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const postId = form.getAttribute('data-post-id');
+                const content = form.querySelector('textarea').value;
+
+                fetch(`/add_comment/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const newComment = document.createElement('div');
+                            newComment.classList.add('comment');
+                            newComment.innerHTML = `<p>${data.comment.content}</p>`;
+
+                            const commentsSection = document.getElementById(`comments-${postId}`);
+                            // Insert the new comment before the comment form
+                            const commentForm = commentsSection.querySelector('.comment-form');
+                            commentsSection.insertBefore(newComment, commentForm);
+
+                            // Update comment count
+                            const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
+                            const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
+                            commentButton.textContent = `${currentCount + 1} comments`;
+
+                            form.querySelector('textarea').value = '';  // Clear the textarea
+                        }
+                    });
+            });
+        };
+
+        // Handle Post Form submission
+        document.getElementById('postForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const content = document.getElementById('postContent').value;
+
+            fetch('/create_post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const newPost = document.createElement('article');
+                        newPost.classList.add('post');
+                        newPost.id = `post-${data.post.id}`;
+                        newPost.innerHTML = `
+                <p class="post-content">${data.post.content}</p>
+                <div class="post-footer">
+                    <div class="post-meta">
+                        <i class="far fa-clock"></i>
+                        <span>${data.post.timestamp}</span>
+                    </div>
+                    <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                        <i class="far fa-comment"></i>
+                        <span>0 comments</span>
+                    </button>
+                </div>
+                <div class="comments" id="comments-${data.post.id}">
+                    <form class="comment-form" data-post-id="${data.post.id}">
+                        <textarea
+                            name="content"
+                            placeholder="Write a comment..."
+                            required
+                        ></textarea>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-reply"></i>
+                            Comment
+                        </button>
+                    </form>
+                </div>
+            `;
+
+                        document.getElementById('postsContainer').prepend(newPost);
+
+                        // Attach event handler to the new post's comment form
+                        const newCommentForm = newPost.querySelector('.comment-form');
+                        attachCommentFormHandler(newCommentForm);
+
+                        document.getElementById('postContent').value = '';  // Clear the textarea
+                    }
+                });
         });
 
-        const scrollTopBtn = document.getElementById('scrollTopBtn');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 500) {
-                scrollTopBtn.classList.add('visible');
+        // Attach handlers to existing comment forms
+        document.querySelectorAll('.comment-form').forEach(form => {
+            attachCommentFormHandler(form);
+        });
+        // Theme Toggle
+        const themeToggleButton = document.querySelector('.theme-toggle');
+        const rootElement = document.documentElement;
+
+        // Check and set initial theme from localStorage
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            rootElement.setAttribute('data-theme', savedTheme);
+            updateThemeToggleIcon(savedTheme);
+        } else {
+            // Default to light theme if no preference is saved
+            rootElement.setAttribute('data-theme', 'light');
+        }
+
+        themeToggleButton.addEventListener('click', () => {
+            // Get current theme
+            const currentTheme = rootElement.getAttribute('data-theme');
+            // Toggle between 'dark' and 'light'
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            rootElement.setAttribute('data-theme', newTheme);
+            // Save the new theme to localStorage
+            localStorage.setItem('theme', newTheme);
+            // Update the theme toggle icon
+            updateThemeToggleIcon(newTheme);
+        });
+
+        function updateThemeToggleIcon(theme) {
+            const icon = themeToggleButton.querySelector('i');
+            if (theme === 'dark') {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
             } else {
-                scrollTopBtn.classList.remove('visible');
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
             }
-        });
+        }
 
-        scrollTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
     </script>
 </body>
 
