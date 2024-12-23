@@ -354,9 +354,7 @@
     <div class="comments" id="comments-{{ post.id }}">
         <ul>
             {% for comment in post.comments %}
-                <li>
-                 {{ comment.content }}
-                </li>
+            <p>${data.comment.content}</p>
             {% endfor %}
         </ul>
         
