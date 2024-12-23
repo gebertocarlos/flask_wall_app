@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -49,6 +48,9 @@
             color: var(--gray-700);
             line-height: 1.6;
             transition: background-color 0.3s ease;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .navbar {
@@ -69,12 +71,6 @@
             align-items: center;
         }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
         .brand {
             font-size: 1.5rem;
             font-weight: 700;
@@ -91,12 +87,9 @@
             color: var(--gray-600);
             cursor: pointer;
             padding: 1rem;
-            /* Increased padding for a larger button */
             border-radius: 1rem;
-            /* Rounded corners */
             transition: all 0.2s ease;
             font-size: 1.5rem;
-            /* Larger font size for the icon */
         }
 
         .theme-toggle:hover {
@@ -104,18 +97,38 @@
             color: var(--primary);
         }
 
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            height: calc(100vh - 64px);
+            position: relative;
+        }
+
+        .post-form-container {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            background: var(--gray-100);
+            padding: 1rem 0;
+        }
+
         .post-form {
             background: var(--gray-50);
             border-radius: 1rem;
             padding: 1.5rem;
             box-shadow: var(--shadow-md);
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             transition: all 0.3s ease;
+            display: none;
         }
 
-        .post-form:focus-within {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+        .post-form.visible {
+            display: block;
+            animation: slideDown 0.3s ease;
         }
 
         .post-form textarea {
@@ -135,6 +148,32 @@
         .post-form textarea:focus {
             outline: none;
             border-color: var(--primary);
+        }
+
+        .toggle-post-form {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .toggle-post-form:hover {
+            background: var(--primary-dark);
+        }
+
+        .posts-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
         }
 
         .btn {
@@ -260,41 +299,11 @@
             background: var(--gray-100);
         }
 
-        .scroll-top {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--primary);
-            color: white;
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transform: translateY(1rem);
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-md);
-        }
-
-        .scroll-top.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .scroll-top:hover {
-            background: var(--primary-dark);
-            transform: translateY(-2px);
-        }
-
         @keyframes slideDown {
             from {
                 opacity: 0;
                 transform: translateY(-10px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -313,7 +322,6 @@
         }
     </style>
 </head>
-
 <body>
     <nav class="navbar">
         <div class="navbar-content">
@@ -328,18 +336,23 @@
     </nav>
 
     <main class="container">
-        <div class="post-form">
-            <form id="postForm">
-                <textarea name="content" id="postContent" placeholder="What's on your mind?" required></textarea>
-                <button type="submit" class="btn">
-                    <i class="fas fa-paper-plane"></i>
-                    Share Post
-                </button>
-            </form>
+        <div class="post-form-container">
+            <button class="toggle-post-form">
+                <i class="fas fa-plus"></i>
+                Post Something
+            </button>
+            <div class="post-form">
+                <form id="postForm">
+                    <textarea name="content" id="postContent" placeholder="What's on your mind?" required></textarea>
+                    <button type="submit" class="btn">
+                        <i class="fas fa-paper-plane"></i>
+                        Share Post
+                    </button>
+                </form>
+            </div>
         </div>
 
-        <div id="postsContainer">
-            <!-- Inside the for loop for posts -->
+        <div class="posts-container" id="postsContainer">
             {% for post in posts %}
             <article class="post" id="post-{{ post.id }}">
                 <p class="post-content">{{ post.content }}</p>
@@ -372,140 +385,24 @@
         </div>
     </main>
 
-    <button class="scroll-top" aria-label="Scroll to top">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-
     <script>
-        // Theme Toggle and other code remains the same
-
-        // Comment Toggle
-        // Comment Toggle
-        const toggleComments = (commentsId) => {
-            const commentsSection = document.getElementById(commentsId);
-            commentsSection.classList.toggle('visible');
-        };
-
-        // Attach comment form handler
-        const attachCommentFormHandler = (form) => {
-            form.addEventListener('submit', (event) => {
-                event.preventDefault();
-                const postId = form.getAttribute('data-post-id');
-                const content = form.querySelector('textarea').value;
-
-                fetch(`/add_comment/${postId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ content })
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            const newComment = document.createElement('div');
-                            newComment.classList.add('comment');
-                            newComment.innerHTML = `<p>${data.comment.content}</p>`;
-
-                            const commentsSection = document.getElementById(`comments-${postId}`);
-                            // Insert the new comment before the comment form
-                            const commentForm = commentsSection.querySelector('.comment-form');
-                            commentsSection.insertBefore(newComment, commentForm);
-
-                            // Update comment count
-                            const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
-                            const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
-                            commentButton.textContent = `${currentCount + 1} comments`;
-
-                            form.querySelector('textarea').value = '';  // Clear the textarea
-                        }
-                    });
-            });
-        };
-
-        // Handle Post Form submission
-        document.getElementById('postForm').addEventListener('submit', (event) => {
-            event.preventDefault();
-            const content = document.getElementById('postContent').value;
-
-            fetch('/create_post', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const newPost = document.createElement('article');
-                        newPost.classList.add('post');
-                        newPost.id = `post-${data.post.id}`;
-                        newPost.innerHTML = `
-                <p class="post-content">${data.post.content}</p>
-                <div class="post-footer">
-                    <div class="post-meta">
-                        <i class="far fa-clock"></i>
-                        <span>${data.post.timestamp}</span>
-                    </div>
-                    <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                        <i class="far fa-comment"></i>
-                        <span>0 comments</span>
-                    </button>
-                </div>
-                <div class="comments" id="comments-${data.post.id}">
-                    <form class="comment-form" data-post-id="${data.post.id}">
-                        <textarea
-                            name="content"
-                            placeholder="Write a comment..."
-                            required
-                        ></textarea>
-                        <button type="submit" class="btn">
-                            <i class="fas fa-reply"></i>
-                            Comment
-                        </button>
-                    </form>
-                </div>
-            `;
-
-                        document.getElementById('postsContainer').prepend(newPost);
-
-                        // Attach event handler to the new post's comment form
-                        const newCommentForm = newPost.querySelector('.comment-form');
-                        attachCommentFormHandler(newCommentForm);
-
-                        document.getElementById('postContent').value = '';  // Clear the textarea
-                    }
-                });
-        });
-
-        // Attach handlers to existing comment forms
-        document.querySelectorAll('.comment-form').forEach(form => {
-            attachCommentFormHandler(form);
-        });
         // Theme Toggle
         const themeToggleButton = document.querySelector('.theme-toggle');
         const rootElement = document.documentElement;
 
-        // Check and set initial theme from localStorage
         const savedTheme = localStorage.getItem('theme');
         if (savedTheme) {
             rootElement.setAttribute('data-theme', savedTheme);
             updateThemeToggleIcon(savedTheme);
         } else {
-            // Default to light theme if no preference is saved
             rootElement.setAttribute('data-theme', 'light');
         }
 
         themeToggleButton.addEventListener('click', () => {
-            // Get current theme
             const currentTheme = rootElement.getAttribute('data-theme');
-            // Toggle between 'dark' and 'light'
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             rootElement.setAttribute('data-theme', newTheme);
-            // Save the new theme to localStorage
             localStorage.setItem('theme', newTheme);
-            // Update the theme toggle icon
             updateThemeToggleIcon(newTheme);
         });
 
@@ -520,7 +417,119 @@
             }
         }
 
-    </script>
-</body>
+        const togglePostForm = document.querySelector('.toggle-post-form');
+        const postForm = document.querySelector('.post-form');
 
+        togglePostForm.addEventListener('click', () => {
+            postForm.classList.toggle('visible');
+            const isVisible = postForm.classList.contains('visible');
+            togglePostForm.innerHTML = isVisible ? 
+                '<i class="fas fa-times"></i> Close' : 
+                '<i class="fas fa-plus"></i> Post Something';
+        });
+
+        // Comment Toggle
+        const toggleComments = (commentsId) => {
+            const commentsSection = document.getElementById(commentsId);
+            commentsSection.classList.toggle('visible');
+        };
+
+        // Handle Comment Form
+        const attachCommentFormHandler = (form) => {
+            form.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const postId = form.getAttribute('data-post-id');
+                const content = form.querySelector('textarea').value;
+
+                fetch(`/add_comment/${postId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const newComment = document.createElement('div');
+                        newComment.classList.add('comment');
+                        newComment.innerHTML = `<p>${data.comment.content}</p>`;
+
+                        const commentsSection = document.getElementById(`comments-${postId}`);
+                        const commentForm = commentsSection.querySelector('.comment-form');
+                        commentsSection.insertBefore(newComment, commentForm);
+
+                        const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
+                        const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
+                        commentButton.textContent = `${currentCount + 1} comments`;
+
+                        form.querySelector('textarea').value = '';
+                    }
+                });
+            });
+        };
+
+        // Handle Post Form
+        document.getElementById('postForm').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const content = document.getElementById('postContent').value;
+
+            fetch('/create_post', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const newPost = document.createElement('article');
+                    newPost.classList.add('post');
+                    newPost.id = `post-${data.post.id}`;
+                    newPost.innerHTML = `
+                        <p class="post-content">${data.post.content}</p>
+                        <div class="post-footer">
+                            <div class="post-meta">
+                                <i class="far fa-clock"></i>
+                                <span>${data.post.timestamp}</span>
+                            </div>
+                            <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                                <i class="far fa-comment"></i>
+                                <span>0 comments</span>
+                            </button>
+                        </div>
+                        <div class="comments" id="comments-${data.post.id}">
+                            <form class="comment-form" data-post-id="${data.post.id}">
+                                <textarea name="content" placeholder="Write a comment..." required></textarea>
+                                <button type="submit" class="btn">
+                                    <i class="fas fa-reply"></i>
+                                    Comment
+                                </button>
+                            </form>
+                        </div>
+                    `;
+
+                    const postsContainer = document.getElementById('postsContainer');
+                    if (postsContainer.firstChild) {
+                        postsContainer.insertBefore(newPost, postsContainer.firstChild);
+                    } else {
+                        postsContainer.appendChild(newPost);
+                    }
+
+                    const newCommentForm = newPost.querySelector('.comment-form');
+                    attachCommentFormHandler(newCommentForm);
+
+                    document.getElementById('postContent').value = '';
+                    postForm.classList.remove('visible');
+                    togglePostForm.innerHTML = '<i class="fas fa-plus"></i> Post Something';
+                }
+            });
+        });
+
+        // Initialize comment form handlers
+        document.querySelectorAll('.comment-form').forEach(form => {
+            attachCommentFormHandler(form);
+        });
+    </script></body>
 </html>
