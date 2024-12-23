@@ -352,11 +352,14 @@
         </button>
     </div>
     <div class="comments" id="comments-{{ post.id }}">
-        {% for comment in post.comments %}
-        <div class="comment">
-            <p>{{ comment.content }}</p>
-        </div>
-        {% endfor %}
+        <ul>
+            {% for comment in post.comments %}
+                <li>
+                    <strong>{{ comment.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</strong>: {{ comment.content }}
+                </li>
+            {% endfor %}
+        </ul>
+        
         <form class="comment-form" data-post-id="{{ post.id }}">
             <textarea
                 name="content"
