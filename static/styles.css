@@ -1,36 +1,43 @@
-/* Root styles */
+/* Theme Variables */
 :root {
-    --primary: #4f46e5; /* Indigo-500 */
-    --primary-dark: #4338ca; /* Indigo-600 */
-    --primary-light: #6366f1; /* Indigo-400 */
-    --surface: #f9fafb; /* Neutral light */
-    --surface-hover: #f3f4f6; /* Neutral hover */
-    --border: #d1d5db; /* Neutral border */
-    --text: #111827; /* Neutral dark */
-    --text-secondary: #6b7280; /* Neutral muted */
+    /* Colors */
+    --primary: #4f46e5;
+    --primary-dark: #4338ca;
+    --primary-light: #6366f1;
+    --surface: #f9fafb;
+    --surface-hover: #f3f4f6;
+    --surface-alt: #ffffff;
+    --border: #d1d5db;
+    --text: #111827;
+    --text-secondary: #6b7280;
+    
+    /* Shadows */
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Dark Theme */
 [data-theme="dark"] {
-    --primary: #6366f1; /* Indigo-400 */
-    --primary-dark: #4f46e5; /* Indigo-500 */
-    --primary-light: #818cf8; /* Indigo-300 */
-    --surface: #121212; /* Dark background */
-    --surface-hover: #1f1f1f; /* Slightly lighter hover */
-    --border: #374151; /* Dark border */
-    --text: #f3f4f6; /* Near-white text */
-    --text-secondary: #9ca3af; /* Gray-muted text */
+    --primary: #6366f1;
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
+    --surface: #121212;
+    --surface-hover: #1f1f1f;
+    --surface-alt: #1a1a1a;
+    --border: #374151;
+    --text: #f3f4f6;
+    --text-secondary: #9ca3af;
 }
 
-
+/* Reset Styles */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Base Styles */
 body {
     font-family: 'Poppins', 'Montserrat', 'Arial', sans-serif;
     background-color: var(--surface);
@@ -43,7 +50,18 @@ body {
     overflow: hidden;
 }
 
-/* Restored navbar styles */
+/* Layout Components */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+    height: calc(100vh - 64px);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Navigation */
 .navbar {
     background: var(--surface);
     padding: 1rem;
@@ -72,6 +90,7 @@ body {
     gap: 0.5rem;
 }
 
+/* Theme Toggle */
 .theme-toggle {
     background: none;
     border: none;
@@ -87,24 +106,50 @@ body {
     color: var(--primary);
 }
 
-/* Main container layout */
-.container {
-    max-width: 800px;
-    margin: 0 auto;
-    width: 100%;
-    height: calc(100vh - 64px); /* Adjusted for navbar height */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+/* Editor Styles */
+.ql-toolbar {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    border-color: var(--border) !important;
+    background: var(--surface-alt);
 }
 
-/* Post form container - sticky */
+.ql-container {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    border-color: var(--border) !important;
+    font-family: inherit !important;
+}
+
+.ql-editor {
+    min-height: 150px;
+    font-size: 1rem;
+    line-height: 1.6;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Text Alignment */
+.ql-align-center {
+    text-align: center !important;
+}
+
+.ql-align-left {
+    text-align: left !important;
+}
+
+.ql-align-right {
+    text-align: right !important;
+}
+
+/* Post Components */
 .post-form-container {
     position: sticky;
     top: 0;
     background: var(--surface);
     padding: 1rem;
     z-index: 10;
+    display: contents;
 }
 
 /* Posts container with scroll */
@@ -114,7 +159,7 @@ body {
     padding: 0 1rem 1rem 1rem;
 }
 
-/* Rest of the styles from the minimal design */
+/* Post Form */
 .toggle-post-form {
     width: 100%;
     padding: 0.75rem;
@@ -134,7 +179,6 @@ body {
     background: var(--surface-hover);
 }
 
-/* Rest of the styles remain the same... */
 .post-form {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -148,38 +192,7 @@ body {
     animation: fadeIn 0.2s ease;
 }
 
-.post-form textarea {
-    width: 100%;
-    min-height: 120px;
-    padding: 1rem;
-    border: none;
-    border-bottom: 1px solid var(--border);
-    font-size: 1rem;
-    resize: none;
-    background: var(--surface);
-    color: var(--text);
-}
-
-.post-form textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-}
-
-.btn {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 0.75rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
-    cursor: pointer;
-    font-size: 0.875rem;
-}
-
-.btn:hover {
-    background: var(--primary-dark);
-}
-
+/* Post Content */
 .post {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -192,22 +205,21 @@ body {
     font-size: 1rem;
     margin-bottom: 1.5rem;
     line-height: 1.6;
+    text-align: inherit;
 }
 
-.post-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+/* Unified iframe styles */
+.post-content iframe,
+.ql-editor iframe {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+    display: block;
+    margin: 0 auto;
+    border: none;
 }
 
-.post-meta {
-    display: flex;
-    gap: 0.5rem;
-    align-items: center;
-}
-
+/* Comments Section */
 .comments {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
@@ -245,6 +257,22 @@ body {
     border-color: var(--primary);
 }
 
+/* Buttons */
+.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.btn:hover {
+    background: var(--primary-dark);
+}
+
 .action-btn {
     background: none;
     border: none;
@@ -263,16 +291,13 @@ body {
     color: var(--primary);
 }
 
+/* Animations */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-/* Scrollbar */
+/* Scrollbar Styles */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -290,24 +315,29 @@ body {
     background: var(--text-secondary);
 }
 
+/* Responsive Design */
 @media (max-width: 640px) {
     .navbar {
         padding: 0.75rem 1rem;
     }
     
     .brand {
-        font-size: 1.25rem;
+        font-size: 1.5rem;
     }
     
-    .post-form-container {
+    .post-form-container,
+    .posts-container {
         padding: 0.75rem;
     }
     
-    .posts-container {
-        padding: 0 0.75rem 0.75rem 0.75rem;
-    }
-    
-    .post, .comment {
+    .post,
+    .comment {
         padding: 1rem;
+    }
+
+    .post-content iframe,
+    .ql-editor iframe {
+        max-width: 100%;
+        aspect-ratio: 16 / 9;
     }
 }
