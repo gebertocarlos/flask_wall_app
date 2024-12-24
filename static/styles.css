@@ -1,34 +1,43 @@
 /* Theme Variables */
 :root {
-    /* Colors */
-    --primary: #4f46e5;
-    --primary-dark: #4338ca;
-    --primary-light: #6366f1;
-    --surface: #f9fafb;
-    --surface-hover: #f3f4f6;
-    --surface-alt: #ffffff;
-    --border: #d1d5db;
-    --text: #111827;
-    --text-secondary: #6b7280;
+    /* Primary Colors - Using a refined indigo palette with better balance */
+    --primary: #4338ca; /* Slightly darker base for better contrast */
+    --primary-dark: #3730a3; /* Deeper shade for interactive states */
+    --primary-light: #6366f1; /* Brighter shade for highlights */
     
-    /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.2);
-}
-
-/* Dark Theme */
-[data-theme="dark"] {
-    --primary: #6366f1;
-    --primary-dark: #4f46e5;
-    --primary-light: #818cf8;
-    --surface: #121212;
-    --surface-hover: #1f1f1f;
-    --surface-alt: #1a1a1a;
-    --border: #374151;
-    --text: #f3f4f6;
-    --text-secondary: #9ca3af;
-}
+    /* Surface Colors - More nuanced gradient for depth */
+    --surface: #f8fafc; /* Slightly cooler white for reduced eye strain */
+    --surface-hover: #f1f5f9; /* Subtle hover state */
+    --surface-alt: #ffffff; /* Pure white for elevated elements */
+    
+    /* Border and Text - Enhanced readability */
+    --border: #cbd5e1; /* Softer border color */
+    --text: #0f172a; /* Deeper text for better contrast */
+    --text-secondary: #475569; /* More visible secondary text */
+    
+    /* Shadow System - More natural depth perception */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
+    --shadow-md: 0 8px 16px rgba(15, 23, 42, 0.12);
+  }
+  
+  /* Dark Theme - Optimized for reduced eye strain */
+  [data-theme="dark"] {
+    /* Primary Colors - Adjusted for dark mode visibility */
+    --primary: #818cf8; /* Brighter primary for dark background */
+    --primary-dark: #6366f1; /* Adjusted for dark mode contrast */
+    --primary-light: #a5b4fc; /* Lighter accents for dark mode */
+    
+    /* Surface Colors - Softer dark theme */
+    --surface: #0f172a; /* Navy-tinted dark background */
+    --surface-hover: #1e293b; /* Warmer hover state */
+    --surface-alt: #1e293b; /* Elevated surface with subtle difference */
+    
+    /* Border and Text - Enhanced dark mode legibility */
+    --border: #334155; /* More visible borders */
+    --text: #f8fafc; /* Slightly off-white for reduced eye strain */
+    --text-secondary: #cbd5e1; /* More legible secondary text */
+  }
 
 /* Reset Styles */
 * {
@@ -107,6 +116,7 @@ body {
 }
 
 /* Editor Styles */
+/* Editor Styles */
 .ql-toolbar {
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
@@ -129,6 +139,75 @@ body {
     margin: 0 auto;
 }
 
+/* Enhanced Quill Editor Styles for Dark Mode */
+.ql-editor.ql-blank::before {
+    font-family: 'Poppins', 'Montserrat', 'Arial', sans-serif !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem;
+    opacity: 0.7;
+    font-style: normal !important;
+    font-weight: 400 !important;
+    transition: color 0.3s ease;
+}
+
+/* Dark Mode Quill Toolbar Enhancements */
+[data-theme="dark"] .ql-toolbar {
+    /* Enhanced toolbar background for better visibility */
+    background: var(--surface-hover);
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .ql-toolbar button {
+    /* Increase visibility of toolbar icons */
+    filter: brightness(2.5);
+}
+
+[data-theme="dark"] .ql-toolbar button:hover {
+    /* Improved hover feedback */
+    background-color: var(--surface);
+}
+
+[data-theme="dark"] .ql-toolbar .ql-picker {
+    /* Enhanced dropdown text visibility */
+    color: var(--text) !important;
+}
+
+[data-theme="dark"] .ql-toolbar .ql-picker-options {
+    /* Consistent dropdown menu styling */
+    background-color: var(--surface-hover);
+    border-color: var(--border) !important;
+}
+
+[data-theme="dark"] .ql-toolbar .ql-picker-item {
+    /* Better dropdown item visibility */
+    color: var(--text);
+}
+
+[data-theme="dark"] .ql-toolbar button.ql-active,
+[data-theme="dark"] .ql-toolbar .ql-picker-label.ql-active {
+    /* More visible active state */
+    background-color: var(--primary);
+    border-radius: 4px;
+}
+
+[data-theme="dark"] .ql-toolbar .ql-color-picker .ql-picker-label {
+    /* Enhanced color picker visibility */
+    filter: brightness(2.5);
+}
+
+[data-theme="dark"] .ql-toolbar .ql-formats {
+    /* Better toolbar section separation */
+    border-right: 1px solid var(--border);
+    padding-right: 5px;
+    margin-right: 5px;
+}
+/* Add this to your CSS file in the Quill editor section */
+.ql-editor.ql-blank::before {
+    color: var(--text-secondary) !important;
+    opacity: 0.7;
+    font-style: normal !important;
+    transition: color 0.3s ease;
+}
 /* Text Alignment */
 .ql-align-center {
     text-align: center !important;
@@ -231,6 +310,30 @@ body {
     display: block;
     animation: fadeIn 0.2s ease;
 }
+.post-footer {
+    display: flex;
+    justify-content: space-between; /* Ensures space between items */
+    align-items: center; /* Vertically center items */
+    margin-top: 10px; /* Optional: space between content and footer */
+}
+
+.timestamp {
+    font-size: 14px; /* Optional: style the timestamp */
+    color: #666; /* Optional: color for timestamp */
+}
+
+.action-btn {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #333; /* Optional: color for the comment button */
+}
+
+.action-btn i {
+    margin-right: 5px; /* Optional: space between icon and text */
+}
 
 .comment {
     background: var(--surface-hover);
@@ -241,6 +344,7 @@ body {
 
 .comment-form textarea {
     width: 100%;
+    font-family: 'Poppins', 'Montserrat', 'Arial', sans-serif;
     min-height: 80px;
     padding: 0.75rem;
     border: 1px solid var(--border);
@@ -249,7 +353,9 @@ body {
     resize: none;
     margin-bottom: 1rem;
     background: var(--surface);
-    color: var(--text);
+    color: var(--text); /* Changed to use regular text color */
+    
+    
 }
 
 .comment-form textarea:focus {
@@ -332,7 +438,7 @@ body {
     
     .post,
     .comment {
-        padding: 1rem;
+        padding: 0.5rem;
     }
 
     .post-content iframe,

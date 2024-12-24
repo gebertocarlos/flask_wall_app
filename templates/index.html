@@ -1,17 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wall App</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.0/gsap.min.js"></script>
-    <link rel="stylesheet" href="/static/styles.css">
-    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-
-</head>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Wall App</title>
+    
+        <!-- Google Fonts -->
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+    
+        <!-- Font Awesome -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+        <!-- GSAP -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.0/gsap.min.js" defer></script>
+    
+        <!-- Custom Styles -->
+        <link rel="stylesheet" href="/static/styles.css">
+    
+        <!-- Quill Editor -->
+        <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+        <script src="https://cdn.quilljs.com/1.3.7/quill.min.js" defer></script>
+  
+    </head>
+    
 <body>
+    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="navbar-content">
             <a href="/" class="brand">
@@ -24,7 +37,9 @@
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="container">
+        <!-- Post Creation Form -->
         <div class="post-form-container">
             <button class="toggle-post-form">
                 <i class="fas fa-plus"></i>
@@ -39,24 +54,24 @@
                         Share Post
                     </button>
                 </form>
-                            </div>
+            </div>
         </div>
 
+        <!-- Posts Section -->
         <div class="posts-container" id="postsContainer">
             {% for post in posts %}
             <article class="post" id="post-{{ post.id }}">
                 <p class="post-content">{{ post.content|safe }}</p>
-
+                
                 <div class="post-footer">
-                    <div class="post-meta">
-                        <i class="far fa-clock"></i>
-                        <span>{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
-                    </div>
+                    <span class="timestamp">{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    
                     <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
                         <i class="far fa-comment"></i>
                         <span>{{ post.comments|length }} comments</span>
                     </button>
                 </div>
+                                <!-- Comments Section -->
                 <div class="comments" id="comments-{{ post.id }}">
                     {% for comment in post.comments %}
                     <div class="comment">
@@ -78,101 +93,80 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Initialize Quill Editor
             const quill = new Quill('#quill-editor', {
-    theme: 'snow',
-    placeholder: 'Write your post...',
-        modules: {
-toolbar: [
-    // Text styling
-    ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
-    
-    // Header options
-    [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }, { 'header': 4 }, { 'header': 5 }, { 'header': 6 }],
-    
-    // Font options
-    [{ 'size': ['small', false, 'large', 'huge'] }], // Size options
-    
-    // List options
-    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-    [{ 'indent': '-1' }, { 'indent': '+1' }],
-    
-    // Alignment
-    [{ 'align': [] }],
-    
-    // Color options
-    [{ 'color': [] }, { 'background': [] }],
-    
-    // Script options
-    [{ 'script': 'sub' }, { 'script': 'super' }],
-    
-    // Links and media
-    ['link', 'image', 'video'],
-    
-    // Other formatting tools
-    ['direction', 'clean'],  // Text direction (rtl/ltr) and clear formatting
-    
-    // Table options (if you plan to use tables with Quill)
-    ['table'],
-    
-    // Emoji (if you have an emoji module integrated)
-    ['emoji']
-]
+                theme: 'snow',
+                placeholder: 'Write something on the wall...',
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+                        [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }],
+                        [{ 'size': ['small', false, 'large', 'huge'] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'align': [] }],
+                        [{ 'color': [] }, { 'background': [] }],
+                        ['link', 'image', 'video'],
+                        ['direction', 'clean']
+                    ]
+                }
+            });
 
-        }
-    });
+            const postForm = document.getElementById('postForm');
+            const quillHiddenContent = document.getElementById('quillHiddenContent');
 
-    const postForm = document.getElementById('postForm');
-    const quillHiddenContent = document.getElementById('quillHiddenContent');
+            postForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                quillHiddenContent.value = quill.root.innerHTML; // Get Quill content
+                
+                fetch('/create_post', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content: quillHiddenContent.value })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const newPost = document.createElement('article');
+                        newPost.classList.add('post');
+                        newPost.id = `post-${data.post.id}`;
+                        newPost.innerHTML = `
+                            <div class="post-header">
+                                <p class="post-content">${data.post.content}</p>
+                                <div class="post-footer">
+                                    <div class="post-meta">
+                                        <i class="far fa-clock"></i>
+                                        <span>${data.post.timestamp}</span>
+                                    </div>
+                                    <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                                        <i class="far fa-comment"></i>
+                                        <span>0 comments</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="comments" id="comments-${data.post.id}">
+                                <form class="comment-form" data-post-id="${data.post.id}">
+                                    <textarea name="content" placeholder="Write a comment..." required></textarea>
+                                    <button type="submit" class="btn">
+                                        <i class="fas fa-reply"></i>
+                                        Comment
+                                    </button>
+                                </form>
+                            </div>
+                        `;
 
-    postForm.addEventListener('submit', (event) => {
-        event.preventDefault();
-        quillHiddenContent.value = quill.root.innerHTML; // Get Quill content
-        
-        fetch('/create_post', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ content: quillHiddenContent.value })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // Your existing code to handle the new post
-                const newPost = document.createElement('article');
-                newPost.classList.add('post');
-                newPost.id = `post-${data.post.id}`;
-                newPost.innerHTML = `
-                    <p class="post-content">${data.post.content}</p>
-                    <div class="post-footer">
-                        <div class="post-meta">
-                            <i class="far fa-clock"></i>
-                            <span>${data.post.timestamp}</span>
-                        </div>
-                        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                            <i class="far fa-comment"></i>
-                            <span>0 comments</span>
-                        </button>
-                    </div>
-                    <div class="comments" id="comments-${data.post.id}">
-                        <form class="comment-form" data-post-id="${data.post.id}">
-                            <textarea name="content" placeholder="Write a comment..." required></textarea>
-                            <button type="submit" class="btn">
-                                <i class="fas fa-reply"></i>
-                                Comment
-                            </button>
-                        </form>
-                    </div>
-                `;
-
-                const postsContainer = document.getElementById('postsContainer');
-                postsContainer.insertBefore(newPost, postsContainer.firstChild);
-                quill.root.innerHTML = ''; // Clear the Quill editor
-                postForm.classList.remove('visible');
-            }
-        });
-    });
+                        const postsContainer = document.getElementById('postsContainer');
+                        postsContainer.insertBefore(newPost, postsContainer.firstChild);
+                        quill.root.innerHTML = ''; // Clear the Quill editor
+                        postForm.classList.remove('visible');
+                    }
+                    const savedTheme = localStorage.getItem('theme') || 'light';
+    rootElement.setAttribute('data-theme', savedTheme);
+    updateThemeToggleIcon(savedTheme);
 });
+            });
+        });
 
         // Theme Toggle
         const themeToggleButton = document.querySelector('.theme-toggle');
@@ -187,12 +181,15 @@ toolbar: [
         }
 
         themeToggleButton.addEventListener('click', () => {
-            const currentTheme = rootElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            rootElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('theme', newTheme);
-            updateThemeToggleIcon(newTheme);
-        });
+    const currentTheme = rootElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    rootElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeToggleIcon(newTheme);
+    
+    // Remove the existing placeholder color setting code since we'll handle it through CSS variables
+});
+
 
         function updateThemeToggleIcon(theme) {
             const icon = themeToggleButton.querySelector('i');
@@ -205,6 +202,7 @@ toolbar: [
             }
         }
 
+        // Post Form Toggle
         const togglePostForm = document.querySelector('.toggle-post-form');
         const postForm = document.querySelector('.post-form');
 
@@ -222,7 +220,7 @@ toolbar: [
             commentsSection.classList.toggle('visible');
         };
 
-        // Handle Comment Form
+        // Comment Form Handler
         const attachCommentFormHandler = (form) => {
             form.addEventListener('submit', (event) => {
                 event.preventDefault();
@@ -251,91 +249,14 @@ toolbar: [
                         const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
                         commentButton.textContent = `${currentCount + 1} comments`;
 
-                        form.querySelector('textarea').value = '';
+                        form.querySelector('textarea').value = ''; // Clear comment input
                     }
                 });
             });
         };
 
-        // Handle Post Form
-        document.getElementById('postForm').addEventListener('submit', (event) => {
-            event.preventDefault();
-            const content = document.getElementById('postContent').value;
-
-            fetch('/create_post', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ content })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const newPost = document.createElement('article');
-                    newPost.classList.add('post');
-                    newPost.id = `post-${data.post.id}`;
-                    newPost.innerHTML = `
-                        <p class="post-content">${data.post.content}</p>
-                        <div class="post-footer">
-                            <div class="post-meta">
-                                <i class="far fa-clock"></i>
-                                <span>${data.post.timestamp}</span>
-                            </div>
-                            <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                                <i class="far fa-comment"></i>
-                                <span>0 comments</span>
-                            </button>
-                        </div>
-                        <div class="comments" id="comments-${data.post.id}">
-                            <form class="comment-form" data-post-id="${data.post.id}">
-                                <textarea name="content" placeholder="Write a comment..." required></textarea>
-                                <button type="submit" class="btn">
-                                    <i class="fas fa-reply"></i>
-                                    Comment
-                                </button>
-                            </form>
-                        </div>
-                    `;
-
-                    const postsContainer = document.getElementById('postsContainer');
-                    if (postsContainer.firstChild) {
-                        postsContainer.insertBefore(newPost, postsContainer.firstChild);
-                    } else {
-                        postsContainer.appendChild(newPost);
-                    }
-
-                    const newCommentForm = newPost.querySelector('.comment-form');
-                    attachCommentFormHandler(newCommentForm);
-
-                    document.getElementById('postContent').value = '';
-                    postForm.classList.remove('visible');
-                    togglePostForm.innerHTML = '<i class="fas fa-plus"></i> Post Something';
-                }
-            });
-        });
-
         // Initialize comment form handlers
-        document.querySelectorAll('.comment-form').forEach(form => {
-            attachCommentFormHandler(form);
-        });
-        // Viewport height fix for mobile browsers
-function setViewportHeight() {
-    // First we get the viewport height and we multiple it by 1% to get a value for a vh unit
-    let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-
-// Set initial height
-setViewportHeight();
-
-// Update height on resize and orientation change
-['resize', 'orientationchange'].forEach(event => {
-    window.addEventListener(event, () => {
-        // Add a small delay to ensure the viewport has settled
-        setTimeout(setViewportHeight, 100);
-    });
-});
-
-    </script></body>
+        document.querySelectorAll('.comment-form').forEach(attachCommentFormHandler);
+    </script>
+</body>
 </html>
