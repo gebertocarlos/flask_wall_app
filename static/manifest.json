@@ -3,9 +3,7 @@
     "short_name": "WallApp",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#000000",
-    "theme_color": "#1e1e1e",
-    "icons": [
-
-    ]
+    "background_color": "#12121200", 
+    "theme_color": "#12121200",
+    "icons": []
 }
