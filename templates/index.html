@@ -75,42 +75,41 @@
             </div>
         </div>
 
+        <!-- Posts Section -->
         <div class="posts-container" id="postsContainer">
             {% for post in posts %}
             <article class="post" id="post-{{ post.id }}">
                 <p class="post-content">{{ post.content|safe }}</p>
+                
                 <div class="post-footer">
-                    <div class="post-actions">
-                        <button class="action-btn like-btn" data-post-id="{{ post.id }}">
-                            <i class="far fa-heart"></i>
-                            <span class="like-count">{{ post.likes.count if post.likes else 0 }}</span>
-                            <span>likes</span>
-                        </button>                        <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
-                            <i class="far fa-comment"></i>
-                            <span>{{ post.comments|length }} comments</span>
-                        </button>
-                    </div>
                     <span class="timestamp">{{ post.timestamp }}</span>
+                    
+                    <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
+                        <i class="far fa-comment"></i>
+                        <span>{{ post.comments|length }} comments</span>
+                    </button>
                 </div>
-                <!-- Comments Section -->
-                <div class="comments" id="comments-{{ post.id }}">
-                    {% for comment in post.comments %}
-                    <div class="comment">
-                        <p>{{ comment.content }}</p>
-                        <span class="timestamp">{{ comment.timestamp }}</span>
-                    </div>
-                    {% endfor %}
-                    <form class="comment-form" data-post-id="{{ post.id }}">
-                        <textarea name="content" placeholder="Write a comment..." required></textarea>
-                        <button type="submit" class="btn">
-                            <i class="fas fa-reply"></i>
-                            Comment
-                        </button>
-                    </form>
-                </div>
-            </article>
+                                <!-- Comments Section -->
+                                <div class="comments" id="comments-{{ post.id }}">
+                                    {% for comment in post.comments %}
+                                    <div class="comment">
+                                        <p>{{ comment.content }}</p>
+                                        <!-- Comment Timestamp -->
+                                        <span class="timestamp" data-timestamp="{{ comment.timestamp }}"></span>
+                                    </div>
+                                    {% endfor %}
+                                    <form class="comment-form" data-post-id="{{ post.id }}">
+                                        <textarea name="content" placeholder="Write a comment..." required></textarea>
+                                        <button type="submit" class="btn">
+                                            <i class="fas fa-reply"></i>
+                                            Comment
+                                        </button>
+                                    </form>
+                                </div>
+                                            </article>
             {% endfor %}
-        </div>    </main>
+        </div>
+    </main>
 
     <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -224,23 +223,19 @@ document.addEventListener("DOMContentLoaded", function () {
             newPost.classList.add('post');
             newPost.id = `post-${data.post.id}`;
             newPost.innerHTML = `
-    <div class="post-header">
-        <p class="post-content">${data.post.content}</p>
-        <div class="post-footer">
-            <div class="post-actions">
-                <button class="action-btn like-btn" onclick="likePost(${data.post.id})">
-                    <i class="far fa-heart"></i>
-                    <span class="like-count">0</span> likes
-                </button>
-                <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                    <i class="far fa-comment"></i>
-                    <span>${data.post.comments.length} comments</span>
-                </button>
-            </div>
-            <span class="timestamp">${data.post.timestamp}</span>
-        </div>
-    </div>
-    <div class="comments" id="comments-${data.post.id}">
+                <div class="post-header">
+                    <p class="post-content">${data.post.content}</p>
+                    <div class="post-footer">
+                        <div class="post-meta">
+                            <span class="timestamp">${data.post.timestamp}</span>
+                        </div>
+                        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                            <i class="far fa-comment"></i>
+                            <span>0 comments</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="comments" id="comments-${data.post.id}">
                     <form class="comment-form" data-post-id="${data.post.id}">
                         <textarea name="content" placeholder="Write a comment..." required></textarea>
                         <button type="submit" class="btn">
@@ -266,137 +261,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
         });
-        if (!localStorage.getItem('clientId')) {
-    localStorage.setItem('clientId', Math.random().toString(36).substring(7));
-}
 
-const likedPosts = new Set(JSON.parse(localStorage.getItem('likedPosts') || '[]'));
-
-// Like button functionality
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize like buttons state
-    likedPosts.forEach(postId => {
-        const likeBtn = document.querySelector(`[data-post-id="${postId}"]`);
-        if (likeBtn) {
-            const likeIcon = likeBtn.querySelector('i');
-            likeIcon.classList.remove('far');
-            likeIcon.classList.add('fas');
-            likeBtn.classList.add('liked');
-        }
-    });
-
-    // Add click handlers to all like buttons
-    document.querySelectorAll('.like-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            const postId = this.getAttribute('data-post-id');
-            if (!postId) return;
-            
-            // Convert postId to number for consistency
-            const numericPostId = parseInt(postId, 10);
-            
-            // Check if already liked
-            if (likedPosts.has(numericPostId)) {
-                return;
-            }
-            
-            // Disable button during request
-            this.disabled = true;
-            
-            fetch(`/like_post/${numericPostId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    client_id: localStorage.getItem('clientId')
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the like count
-                    const likeCount = this.querySelector('.like-count');
-                    likeCount.textContent = data.likes;
-                    
-                    // Update the button appearance
-                    const likeIcon = this.querySelector('i');
-                    likeIcon.classList.remove('far');
-                    likeIcon.classList.add('fas');
-                    this.classList.add('liked');
-                    
-                    // Save to liked posts
-                    likedPosts.add(numericPostId);
-                    localStorage.setItem('likedPosts', JSON.stringify([...likedPosts]));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            })
-            .finally(() => {
-                this.disabled = false;
-            });
-        });
-    });
-});
-
-
-function likePost(postId) {
-    // Get the button and its elements
-    const likeBtn = document.querySelector(`[data-post-id="${postId}"]`);
-    const likeIcon = likeBtn.querySelector('i');
-    const likeCount = likeBtn.querySelector('.like-count');
-    
-    // Check if already liked
-    if (likeBtn.classList.contains('liked')) {
-        return;
-    }
-    
-    // Disable button during request
-    likeBtn.disabled = true;
-    
-    fetch(`/like_post/${postId}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            client_id: localStorage.getItem('clientId') || Date.now().toString()
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Update the like count
-            likeCount.textContent = data.likes;
-            
-            // Update the button appearance
-            likeIcon.classList.remove('far');
-            likeIcon.classList.add('fas');
-            likeBtn.classList.add('liked');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    })
-    .finally(() => {
-        likeBtn.disabled = false;
-    });
-}
-// Function to initialize like buttons state
-function initializeLikeButtons() {
-    likedPosts.forEach(postId => {
-        const likeBtn = document.querySelector(`#post-${postId} .like-btn`);
-        if (likeBtn) {
-            const likeIcon = likeBtn.querySelector('i');
-            likeIcon.classList.remove('far');
-            likeIcon.classList.add('fas');
-            likeBtn.classList.add('liked');
-        }
-    });
-}
-
-// Call this when the page loads
-document.addEventListener('DOMContentLoaded', initializeLikeButtons);
 // Theme management with manifest handling
 const themeToggleButton = document.querySelector('.theme-toggle');
 const rootElement = document.documentElement;

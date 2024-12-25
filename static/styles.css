@@ -444,33 +444,7 @@ body {
     background: var(--surface-hover);
     color: var(--primary);
 }
-.like-btn {
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
 
-.like-btn i {
-    transition: transform 0.3s ease;
-}
-
-.like-btn:hover i {
-    transform: scale(1.2);
-}
-
-.like-btn.liked {
-    color: #e11d48; /* Red color for liked state */
-}
-
-.like-btn.liked i {
-    color: #e11d48;
-}
-
-.like-btn:disabled {
-    opacity: 0.7;
-    cursor: default;
-}
 /* Iframe Styles */
 .post-content iframe,
 .ql-editor iframe {

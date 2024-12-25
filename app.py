@@ -53,75 +53,45 @@ def create_post():
             'id': max([p['id'] for p in posts], default=0) + 1,
             'content': content,
             'timestamp': datetime.now(),
-            'comments': [],
-            'likes': {
-                'count': 0,
-                'users': []
-            }
+            'comments': []
         }
         posts.append(new_post)
         save_posts(posts)
         
+        # Create a response version with string timestamp
         response_post = {
             **new_post,
-            'timestamp': new_post['timestamp'].strftime('%B %d, %Y at %H:%M')
+            'timestamp': new_post['timestamp'].strftime('%B %d, %Y at %H:%M')  # 24-hour format
         }
         return jsonify({'success': True, 'post': response_post})
     
     return jsonify({'success': False, 'message': 'No content provided'}), 400
-# Add new route for handling likes
-@app.route('/like_post/<int:post_id>', methods=['POST'])
-def like_post(post_id):
+
+@app.route('/add_comment/<int:post_id>', methods=['POST'])
+def add_comment(post_id):
     data = request.get_json()
-    client_id = data.get('client_id')
+    content = data.get('content')
     
-    if not client_id:
-        return jsonify({'success': False, 'message': 'No client ID provided'}), 400
+    if content:
+        posts = load_posts()
+        post = next((p for p in posts if p['id'] == post_id), None)
         
-    posts = load_posts()
-    post = next((p for p in posts if p['id'] == post_id), None)
+        if post:
+            new_comment = {
+                'content': content,
+                'timestamp': datetime.now()
+            }
+            post['comments'].append(new_comment)  # Add comment to the post
+            save_posts(posts)
+            
+            # Create response with readable time format
+            response_comment = {
+                **new_comment,
+                'timestamp': new_comment['timestamp'].strftime('%B %d, %Y at %H:%M')  # 24-hour format
+            }
+            return jsonify({'success': True, 'comment': response_comment})
     
-    if not post:
-        return jsonify({'success': False, 'message': 'Post not found'}), 404
-        
-    # Initialize likes structure if it doesn't exist
-    if 'likes' not in post:
-        post['likes'] = {'count': 0, 'users': []}
-        
-    # Check if user has already liked
-    if client_id not in post['likes']['users']:
-        post['likes']['users'].append(client_id)
-        post['likes']['count'] += 1
-        save_posts(posts)
-        return jsonify({
-            'success': True,
-            'likes': post['likes']['count'],
-            'hasLiked': True
-        })
-    
-    return jsonify({
-        'success': False,
-        'message': 'Already liked',
-        'likes': post['likes']['count'],
-        'hasLiked': True
-    })
+    return jsonify({'success': False, 'message': 'Failed to add comment'}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
-def initialize_likes_for_posts():
-    posts = load_posts()
-    modified = False
-    for post in posts:
-        if 'likes' not in post:
-            post['likes'] = {
-                'count': 0,
-                'users': []
-            }
-            modified = True
-    if modified:
-        save_posts(posts)
-
-# Call this when your app starts
-@app.before_first_request
-def setup():
-    initialize_likes_for_posts()
