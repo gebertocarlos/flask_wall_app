@@ -1,9 +1,2 @@
 {
-    "name": "Wall App",
-    "short_name": "WallApp",
-    "start_url": "/",
-    "display": "standalone",
-    "background_color": "#12121200", 
-    "theme_color": "#12121200",
-    "icons": []
 }

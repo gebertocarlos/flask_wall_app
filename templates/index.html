@@ -15,7 +15,8 @@
     
         <!-- Manifest Dosyası -->
         <link rel="manifest" href="/static/manifest.json">
-    
+        <meta name="theme-color">
+
         <!-- Favicon -->
         <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon-16x16.png">
@@ -261,28 +262,113 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
 
-        // Theme Toggle
-        const themeToggleButton = document.querySelector('.theme-toggle');
-        const rootElement = document.documentElement;
+// Theme management with manifest handling
+const themeToggleButton = document.querySelector('.theme-toggle');
+const rootElement = document.documentElement;
+const manifestLink = document.querySelector('link[rel="manifest"]');
+const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            rootElement.setAttribute('data-theme', savedTheme);
-            updateThemeToggleIcon(savedTheme);
-        } else {
-            rootElement.setAttribute('data-theme', 'light');
+const themeColors = {
+    light: {
+        background: "#f8fafc", // --surface from light theme
+        theme: "#4338ca"      // --primary from light theme
+    },
+    dark: {
+        background: "#0f172a", // --surface from dark theme
+        theme: "#818cf8"      // --primary from dark theme
+    }
+};
+
+// Function to update manifest
+async function updateManifest(theme) {
+    try {
+        const manifestContent = {
+            name: "Wall App",
+            short_name: "WallApp",
+            start_url: "/",
+            display: "standalone",
+            background_color: themeColors[theme].background,
+            theme_color: themeColors[theme].theme,
+            icons: [] // Your icons array
+        };
+
+        const manifestBlob = new Blob(
+            [JSON.stringify(manifestContent, null, 2)],
+            { type: 'application/json' }
+        );
+
+        const manifestURL = URL.createObjectURL(manifestBlob);
+        
+        // Update manifest link
+        manifestLink.href = manifestURL;
+        
+        // Update theme-color meta tag
+        metaThemeColor.content = themeColors[theme].theme;
+
+        // Clean up old URL if exists
+        if (window.currentManifestURL) {
+            URL.revokeObjectURL(window.currentManifestURL);
         }
+        window.currentManifestURL = manifestURL;
 
-        themeToggleButton.addEventListener('click', () => {
+    } catch (error) {
+        console.error('Error updating manifest:', error);
+    }
+}
+
+// Initialize theme
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+
+    setTheme(initialTheme);
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+}
+
+// Set theme function
+async function setTheme(theme) {
+    rootElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateThemeToggleIcon(theme);
+    await updateManifest(theme);
+}
+
+// Update your existing theme toggle handler
+themeToggleButton.addEventListener('click', () => {
     const currentTheme = rootElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    rootElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('theme', newTheme);
-    updateThemeToggleIcon(newTheme);
-    
-    // Remove the existing placeholder color setting code since we'll handle it through CSS variables
+    setTheme(newTheme);
 });
 
+// Your existing updateThemeToggleIcon function
+function updateThemeToggleIcon(theme) {
+    const icon = themeToggleButton.querySelector('i');
+    
+    icon.style.transition = 'transform 0.5s ease';
+    icon.style.transform = 'rotate(180deg)';
+    
+    setTimeout(() => {
+        if (theme === 'dark') {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon-stars');
+        } else {
+            icon.classList.remove('fa-moon-stars');
+            icon.classList.add('fa-sun');
+        }
+        icon.style.transform = 'rotate(0deg)';
+    }, 250);
+}
+
+// Initialize theme when the page loads
+document.addEventListener('DOMContentLoaded', initializeTheme);
 
 function updateThemeToggleIcon(theme) {
     const icon = themeToggleButton.querySelector('i');
@@ -387,6 +473,7 @@ function updateThemeToggleIcon(theme) {
         });
     });
 });
+
     </script>
 </body>
 </html>
