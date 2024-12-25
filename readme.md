@@ -51,5 +51,5 @@ Wall App is a modern, responsive web application that allows users to create and
 
 1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone https://github.com/gebertocarlos/flask_wall_app
 cd wall-app
