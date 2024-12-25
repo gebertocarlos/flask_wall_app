@@ -1,52 +1,67 @@
-/* Theme Variables */
-:root {
-    /* Primary Colors - Using a refined indigo palette with better balance */
-    --primary: #4338ca; /* Slightly darker base for better contrast */
-    --primary-dark: #3730a3; /* Deeper shade for interactive states */
-    --primary-light: #6366f1; /* Brighter shade for highlights */
-    
-    /* Surface Colors - More nuanced gradient for depth */
-    --surface: #f8fafc; /* Slightly cooler white for reduced eye strain */
-    --surface-hover: #f1f5f9; /* Subtle hover state */
-    --surface-alt: #ffffff; /* Pure white for elevated elements */
-    
-    /* Border and Text - Enhanced readability */
-    --border: #cbd5e1; /* Softer border color */
-    --text: #0f172a; /* Deeper text for better contrast */
-    --text-secondary: #475569; /* More visible secondary text */
-    
-    /* Shadow System - More natural depth perception */
+/* ==========================================================================
+   Table of Contents:
+   1. Theme Variables & Color System
+   2. Reset & Base Styles
+   3. Layout Components
+   4. Navigation
+   5. Editor Components
+   6. Post Components
+   7. Comment System
+   8. Utility Classes
+   9. Animations
+   10. Media Queries
+   ========================================================================== */
+
+/* 1. Theme Variables & Color System
+   ========================================================================== */
+   :root {
+    /* Primary Colors */
+    --primary: #4338ca;
+    --primary-dark: #3730a3;
+    --primary-light: #6366f1;
+
+    /* Surface Colors */
+    --surface: #f8fafc;
+    --surface-hover: #f1f5f9;
+    --surface-alt: #ffffff;
+
+    /* Border and Text */
+    --border: #cbd5e1;
+    --text: #0f172a;
+    --text-secondary: #475569;
+
+    /* Shadow System */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
     --shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
     --shadow-md: 0 8px 16px rgba(15, 23, 42, 0.12);
-  }
-  
-  /* Dark Theme - Optimized for reduced eye strain */
-  [data-theme="dark"] {
-    /* Primary Colors - Adjusted for dark mode visibility */
-    --primary: #818cf8; /* Brighter primary for dark background */
-    --primary-dark: #6366f1; /* Adjusted for dark mode contrast */
-    --primary-light: #a5b4fc; /* Lighter accents for dark mode */
-    
-    /* Surface Colors - Softer dark theme */
-    --surface: #0f172a; /* Navy-tinted dark background */
-    --surface-hover: #1e293b; /* Warmer hover state */
-    --surface-alt: #1e293b; /* Elevated surface with subtle difference */
-    
-    /* Border and Text - Enhanced dark mode legibility */
-    --border: #334155; /* More visible borders */
-    --text: #f8fafc; /* Slightly off-white for reduced eye strain */
-    --text-secondary: #cbd5e1; /* More legible secondary text */
-  }
+}
 
-/* Reset Styles */
+/* Dark Theme */
+[data-theme="dark"] {
+    /* Primary Colors */
+    --primary: #818cf8;
+    --primary-dark: #6366f1;
+    --primary-light: #a5b4fc;
+
+    /* Surface Colors */
+    --surface: #0f172a;
+    --surface-hover: #1e293b;
+    --surface-alt: #1e293b;
+
+    /* Border and Text */
+    --border: #334155;
+    --text: #f8fafc;
+    --text-secondary: #cbd5e1;
+}
+
+/* 2. Reset & Base Styles
+   ========================================================================== */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Base Styles */
 body {
     font-family: 'Poppins', 'Montserrat', 'Arial', sans-serif;
     background-color: var(--surface);
@@ -59,7 +74,8 @@ body {
     overflow: hidden;
 }
 
-/* Layout Components */
+/* 3. Layout Components
+   ========================================================================== */
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -70,14 +86,13 @@ body {
     overflow-y: auto;
 }
 
-/* Navigation Base */
+/* 4. Navigation
+   ========================================================================== */
 .navbar {
-    background: linear-gradient(
-        to right,
+    background: linear-gradient(to right,
         var(--surface) 0%,
         var(--surface-hover) 50%,
-        var(--surface) 100%
-    );
+        var(--surface) 100%);
     padding: 1.25rem;
     backdrop-filter: blur(8px);
     box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
@@ -89,15 +104,12 @@ body {
 }
 
 .navbar:hover {
-    background: linear-gradient(
-        to right,
+    background: linear-gradient(to right,
         var(--surface-hover) 0%,
         var(--surface) 50%,
-        var(--surface-hover) 100%
-    );
+        var(--surface-hover) 100%);
 }
 
-/* Content Container */
 .navbar-content {
     max-width: 800px;
     margin: 0 auto;
@@ -108,15 +120,13 @@ body {
     position: relative;
 }
 
-/* Brand Styling */
+/* Brand */
 .brand {
     font-size: 1.75rem;
     font-weight: 800;
-    background: linear-gradient(
-        135deg,
+    background: linear-gradient(135deg,
         var(--primary) 0%,
-        var(--primary-light) 100%
-    );
+        var(--primary-light) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -135,11 +145,9 @@ body {
 
 .brand i {
     font-size: 1.5rem;
-    background: linear-gradient(
-        135deg,
+    background: linear-gradient(135deg,
         var(--primary) 0%,
-        var(--primary-light) 100%
-    );
+        var(--primary-light) 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -150,7 +158,7 @@ body {
     transform: scale(1.1) rotate(-10deg);
 }
 
-/* Theme Toggle Button */
+/* Theme Toggle */
 .theme-toggle {
     background: var(--surface-alt);
     border: 2px solid var(--border);
@@ -194,17 +202,9 @@ body {
     transform: translateY(1px);
 }
 
-/* Dark Theme Specific Styles */
-[data-theme="dark"] .navbar {
-    background: linear-gradient(
-        to right,
-        rgba(15, 23, 42, 0.8) 0%,
-        rgba(30, 41, 59, 0.8) 50%,
-        rgba(15, 23, 42, 0.8) 100%
-    );
-    backdrop-filter: blur(12px);
-}
-/* Base Quill Editor Styles */
+/* 5. Editor Components
+   ========================================================================== */
+/* Quill Editor Base */
 .ql-editor {
     min-height: 150px;
     font-size: 1rem;
@@ -214,7 +214,6 @@ body {
     padding: 1.25rem;
 }
 
-/* Placeholder Styling */
 .ql-editor.ql-blank::before {
     font-family: 'Poppins', 'Montserrat', 'Arial', sans-serif !important;
     color: var(--text-secondary) !important;
@@ -225,7 +224,7 @@ body {
     transition: color 0.3s ease;
 }
 
-/* Toolbar Styling */
+/* Toolbar */
 .ql-toolbar {
     border-top-left-radius: 0.75rem;
     border-top-right-radius: 0.75rem;
@@ -241,14 +240,13 @@ body {
     font-family: inherit !important;
 }
 
-/* Dark Mode Enhancements */
+/* Dark Mode Editor */
 [data-theme="dark"] .ql-toolbar {
     background: var(--surface-hover);
     border-color: var(--border) !important;
 }
 
 [data-theme="dark"] .ql-toolbar button {
-    /* We keep the brightness filter but reduce it for better visibility */
     filter: brightness(1.8);
 }
 
@@ -256,47 +254,13 @@ body {
     background-color: var(--surface);
 }
 
-/* Picker and Dropdown Styling */
-[data-theme="dark"] .ql-toolbar .ql-picker {
-    color: var(--text) !important;
-}
+/* Editor Alignment */
+.ql-align-center { text-align: center !important; }
+.ql-align-left { text-align: left !important; }
+.ql-align-right { text-align: right !important; }
 
-[data-theme="dark"] .ql-toolbar .ql-picker-options {
-    background-color: var(--surface-hover);
-    border-color: var(--border) !important;
-}
-
-[data-theme="dark"] .ql-toolbar .ql-picker-item {
-    color: var(--text);
-}
-
-/* Active State Styling */
-[data-theme="dark"] .ql-toolbar button.ql-active,
-[data-theme="dark"] .ql-toolbar .ql-picker-label.ql-active {
-    background-color: var(--primary);
-    border-radius: 4px;
-}
-
-/* Format Group Separation */
-[data-theme="dark"] .ql-toolbar .ql-formats {
-    margin-right: 8px;
-    padding-right: 8px;
-    border-right: 1px solid var(--border);
-}
-/* Text Alignment */
-.ql-align-center {
-    text-align: center !important;
-}
-
-.ql-align-left {
-    text-align: left !important;
-}
-
-.ql-align-right {
-    text-align: right !important;
-}
-
-/* Post Components */
+/* 6. Post Components
+   ========================================================================== */
 .post-form-container {
     position: sticky;
     top: 0;
@@ -306,7 +270,6 @@ body {
     display: contents;
 }
 
-/* Posts container with scroll */
 .posts-container {
     flex: 1;
     overflow-y: auto;
@@ -314,69 +277,48 @@ body {
 }
 
 .toggle-post-form {
-    /* Base Layout */
     width: 100%;
     padding: 1rem 1.5rem;
     margin: 0.5rem 0;
-    
-    /* Modern Visual Design */
-    background: linear-gradient(
-        to right,
+    background: linear-gradient(to right,
         var(--surface) 0%,
-        var(--surface-hover) 100%
-    );
+        var(--surface-hover) 100%);
     border: 2px solid var(--border);
     border-radius: 1rem;
     box-shadow: var(--shadow-sm);
-    
-    /* Typography */
     color: var(--text);
     font-weight: 600;
     font-size: 1rem;
     letter-spacing: -0.01em;
-    
-    /* Interactive Elements */
     cursor: pointer;
     transition: all 0.3s ease;
-    
-    /* Flex Layout for Icon and Text */
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 0.75rem;
 }
 
-/* Hover State */
 .toggle-post-form:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow);
     border-color: var(--primary);
-    background: linear-gradient(
-        to right,
+    background: linear-gradient(to right,
         var(--surface-hover) 0%,
-        var(--surface) 100%
-    );
+        var(--surface) 100%);
 }
 
-/* Active State */
 .toggle-post-form:active {
     transform: translateY(1px);
     box-shadow: var(--shadow-sm);
 }
 
-/* Icon Styling */
 .toggle-post-form i {
     font-size: 1.2rem;
     transition: transform 0.3s ease;
 }
 
-/* Icon Animation on Hover */
 .toggle-post-form:hover i {
     transform: rotate(90deg);
-}
-
-.toggle-post-form:hover {
-    background: var(--surface-hover);
 }
 
 .post-form {
@@ -399,7 +341,6 @@ body {
     border-radius: 0.5rem;
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    
 }
 
 .post-content {
@@ -409,57 +350,20 @@ body {
     text-align: inherit;
 }
 
-/* Unified iframe styles */
-.post-content iframe,
-.ql-editor iframe {
-    width: 100%;
-    max-width: 800px;
-    aspect-ratio: 16 / 9;
-    display: block;
-    margin: 0 auto;
-    border: none;
-}
-
-/* Comments Section */
+/* 7. Comment System
+   ========================================================================== */
 .comments {
     margin-top: 1.5rem;
     padding-top: 1.5rem;
     border-top: 1px solid var(--border);
     display: none;
     font-size: 0.80rem;
-    opacity: 0.68;
+    opacity: 0.78;
 }
 
 .comments.visible {
     display: block;
     animation: fadeIn 0.2s ease;
-}
-.post-footer {
-    display: flex;
-    justify-content: space-between; /* Ensures space between items */
-    align-items: center; /* Vertically center items */
-    margin-top: 10px; /* Optional: space between content and footer */
-}
-
-.timestamp {
-    font-size: 12px; /* Optional: style the timestamp */
-    color: #666; /* Optional: color for timestamp */
-    text-align-last: right;
-    opacity: 0.74;
-}
-
-
-.action-btn {
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    color: #333; /* Optional: color for the comment button */
-}
-
-.action-btn i {
-    margin-right: 5px; /* Optional: space between icon and text */
 }
 
 .comment {
@@ -477,12 +381,12 @@ body {
     border: 1px solid var(--border);
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    resize: none;
+    resize: vertical; /* Allow vertical resizing */
     margin-bottom: 1rem;
     background: var(--surface);
-    color: var(--text); /* Changed to use regular text color */
-    
-    
+    color: var(--text);
+    overflow-y: hidden; /* Hide scrollbar while auto-expanding */
+    transition: height 0.2s ease; /* Smooth height transition */
 }
 
 .comment-form textarea:focus {
@@ -490,6 +394,23 @@ body {
     border-color: var(--primary);
 }
 
+/* Post Footer */
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.timestamp {
+    font-size: 12px;
+    color: #666;
+    text-align-last: right;
+    opacity: 0.84;
+}
+
+/* 8. Utility Classes
+   ========================================================================== */
 /* Buttons */
 .btn {
     background: var(--primary);
@@ -524,13 +445,18 @@ body {
     color: var(--primary);
 }
 
-/* Animations */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+/* Iframe Styles */
+.post-content iframe,
+.ql-editor iframe {
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+    display: block;
+    margin: 0 auto;
+    border: none;
 }
 
-/* Scrollbar Styles */
+/* Scrollbar */
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -548,21 +474,29 @@ body {
     background: var(--text-secondary);
 }
 
-/* Responsive Design */
+/* 9. Animations
+   ========================================================================== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* 10. Media Queries
+   ========================================================================== */
 @media (max-width: 640px) {
     .navbar {
         padding: 0.75rem 1rem;
     }
-    
+
     .brand {
         font-size: 1.5rem;
     }
-    
+
     .post-form-container,
     .posts-container {
         padding: 0.75rem;
     }
-    
+
     .post,
     .comment {
         padding: 0.5rem;

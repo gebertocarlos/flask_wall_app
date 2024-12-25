@@ -319,9 +319,20 @@ function updateThemeToggleIcon(theme) {
 
         // Comment Toggle
         const toggleComments = (commentsId) => {
-            const commentsSection = document.getElementById(commentsId);
-            commentsSection.classList.toggle('visible');
-        };
+    const commentsSection = document.getElementById(commentsId);
+    commentsSection.classList.toggle('visible');
+    
+    // If comments are being shown, scroll them into view
+    if (commentsSection.classList.contains('visible')) {
+        // Small delay to allow the comments to become visible first
+        setTimeout(() => {
+            commentsSection.scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'nearest'  // This will minimize unnecessary scrolling
+            });
+        }, 100);
+    }
+};
 
         // Comment Form Handler
         const attachCommentFormHandler = (form) => {
@@ -360,6 +371,22 @@ function updateThemeToggleIcon(theme) {
 
         // Initialize comment form handlers
         document.querySelectorAll('.comment-form').forEach(attachCommentFormHandler);
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const textareas = document.querySelectorAll('.comment-form textarea');
+    
+    textareas.forEach(textarea => {
+        // Set initial height
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+        
+        // Add input event listener
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+});
     </script>
 </body>
 </html>
