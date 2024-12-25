@@ -3,7 +3,12 @@
         "id": 1,
         "content": "<h1 class=\"ql-align-center\"><strong>WELCOME TO THE WALL</strong></h1><p><br></p><p>\tThis app is a community wall platform where users can share their thoughts, ideas, and updates in real time. The app allows users to post messages on a public wall, view posts from others, and engage through comments. Each post and comment displays relevant information, such as the content and timestamp, ensuring an organized and interactive experience. </p><p><br></p><p><strong class=\"ql-size-large\"><u>Key Features: </u></strong></p><p><strong>\u2022 Post Creation: </strong>Users can write and publish posts to share with the community. </p><p><strong>\u2022 Real-Time Comments:</strong> Other users can add comments to any post, fostering discussions and interactions. </p><p><strong>\u2022 Organized Timeline:</strong> Posts are displayed chronologically, showing when they were created. </p><p><strong>\u2022 Dark Theme: </strong>A sleek and modern dark interface ensures a visually appealing experience for users. </p><p><strong>\u2022 User-Friendly Design: </strong>The app is intuitive and easy to navigate, making it accessible to users of all levels. </p><p><br></p><p>\tThis app is ideal for communities, discussion groups, or anyone looking for a shared digital space to communicate and connect.</p>",
         "timestamp": "2024-12-24 17:43:47.243534",
-        "comments": []
+        "comments": [
+            {
+                "content": "very good ",
+                "timestamp": "2024-12-25 02:08:12.759005"
+            }
+        ]
     },
     {
         "id": 2,
@@ -11,8 +16,12 @@
         "timestamp": "2024-12-24 19:46:18.770622",
         "comments": [
             {
-                "content": "asdas",
+                "content": "good content",
                 "timestamp": "2024-12-24 20:34:51.408864"
+            },
+            {
+                "content": "thank you",
+                "timestamp": "2024-12-25 02:25:16.587009"
             }
         ]
     }

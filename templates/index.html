@@ -64,7 +64,7 @@
                 <p class="post-content">{{ post.content|safe }}</p>
                 
                 <div class="post-footer">
-                    <span class="timestamp">{{ post.timestamp.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    <span class="timestamp">{{ post.timestamp }}</span>
                     
                     <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
                         <i class="far fa-comment"></i>
@@ -72,26 +72,102 @@
                     </button>
                 </div>
                                 <!-- Comments Section -->
-                <div class="comments" id="comments-{{ post.id }}">
-                    {% for comment in post.comments %}
-                    <div class="comment">
-                        <p>{{ comment.content }}</p>
-                    </div>
-                    {% endfor %}
-                    <form class="comment-form" data-post-id="{{ post.id }}">
-                        <textarea name="content" placeholder="Write a comment..." required></textarea>
-                        <button type="submit" class="btn">
-                            <i class="fas fa-reply"></i>
-                            Comment
-                        </button>
-                    </form>
-                </div>
-            </article>
+                                <div class="comments" id="comments-{{ post.id }}">
+                                    {% for comment in post.comments %}
+                                    <div class="comment">
+                                        <p>{{ comment.content }}</p>
+                                        <!-- Comment Timestamp -->
+                                        <span class="timestamp" data-timestamp="{{ comment.timestamp }}"></span>
+                                    </div>
+                                    {% endfor %}
+                                    <form class="comment-form" data-post-id="{{ post.id }}">
+                                        <textarea name="content" placeholder="Write a comment..." required></textarea>
+                                        <button type="submit" class="btn">
+                                            <i class="fas fa-reply"></i>
+                                            Comment
+                                        </button>
+                                    </form>
+                                </div>
+                                            </article>
             {% endfor %}
         </div>
     </main>
 
     <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const posts = document.querySelectorAll('.timestamp');
+    
+    posts.forEach(post => {
+        const serverTimestamp = post.textContent;  // Get the raw server timestamp
+
+        // Try to create a Date object from the server timestamp
+        let date = new Date(serverTimestamp);
+        
+        // If the date is invalid, attempt to convert it manually
+        if (isNaN(date)) {
+            // If the server timestamp is in format like '2024-12-24 19:46:18'
+            const formattedTimestamp = serverTimestamp.replace(' ', 'T');  // Convert ' ' to 'T'
+            date = new Date(formattedTimestamp);  // Try again with ISO format
+        }
+        
+        // Format the date according to the user's local timezone
+        const formattedDate = date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            hour12: false // Set to true if you prefer 12-hour format
+        });
+
+        // Set the content of the timestamp element
+        post.textContent = `${formattedDate}`;
+    });
+});
+
+        document.addEventListener("DOMContentLoaded", function () {
+    const calculateTimeDifference = (timestamp) => {
+        const now = new Date();
+        const postTime = new Date(timestamp);
+        const diffInSeconds = Math.floor((now - postTime) / 1000);
+        
+        const minutes = Math.floor(diffInSeconds / 60);
+        const hours = Math.floor(diffInSeconds / 3600);
+        const days = Math.floor(diffInSeconds / 86400);
+        const weeks = Math.floor(diffInSeconds / 604800); // 7 * 24 * 60 * 60
+        const months = Math.floor(diffInSeconds / 2592000); // 30 * 24 * 60 * 60
+        const years = Math.floor(diffInSeconds / 31536000); // 365 * 24 * 60 * 60
+
+        if (minutes < 1) {
+            return 'Just now';
+        } else if (minutes < 60) {
+            return minutes === 1 ? '1 min ago' : `${minutes} min ago`;
+        } else if (hours < 24) {
+            return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+        } else if (days < 7) {
+            return days === 1 ? '1 day ago' : `${days} days ago`;
+        } else if (weeks < 4) {
+            return weeks === 1 ? '1 week ago' : `${weeks} weeks ago`;
+        } else if (months < 12) {
+            return months === 1 ? '1 month ago' : `${months} months ago`;
+        } else {
+            return years === 1 ? '1 year ago' : `${years} years ago`;
+        }
+    };
+
+    // Update only the comment timestamps
+    const updateCommentTimestamps = () => {
+        const commentTimestampElements = document.querySelectorAll('.comment .timestamp');
+        commentTimestampElements.forEach((element) => {
+            const timestamp = element.getAttribute('data-timestamp');
+            const timeAgo = calculateTimeDifference(timestamp);
+            element.textContent = timeAgo;
+        });
+    };
+
+    updateCommentTimestamps();
+});
+
         document.addEventListener("DOMContentLoaded", function () {
             // Initialize Quill Editor
             const quill = new Quill('#quill-editor', {
@@ -111,61 +187,61 @@
                 }
             });
 
-            const postForm = document.getElementById('postForm');
-            const quillHiddenContent = document.getElementById('quillHiddenContent');
-
             postForm.addEventListener('submit', (event) => {
-                event.preventDefault();
-                quillHiddenContent.value = quill.root.innerHTML; // Get Quill content
-                
-                fetch('/create_post', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ content: quillHiddenContent.value })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const newPost = document.createElement('article');
-                        newPost.classList.add('post');
-                        newPost.id = `post-${data.post.id}`;
-                        newPost.innerHTML = `
-                            <div class="post-header">
-                                <p class="post-content">${data.post.content}</p>
-                                <div class="post-footer">
-                                    <div class="post-meta">
-                                        <i class="far fa-clock"></i>
-                                        <span>${data.post.timestamp}</span>
-                                    </div>
-                                    <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                                        <i class="far fa-comment"></i>
-                                        <span>0 comments</span>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="comments" id="comments-${data.post.id}">
-                                <form class="comment-form" data-post-id="${data.post.id}">
-                                    <textarea name="content" placeholder="Write a comment..." required></textarea>
-                                    <button type="submit" class="btn">
-                                        <i class="fas fa-reply"></i>
-                                        Comment
-                                    </button>
-                                </form>
-                            </div>
-                        `;
+    event.preventDefault();
+    quillHiddenContent.value = quill.root.innerHTML; // Get Quill content
+    
+    fetch('/create_post', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ content: quillHiddenContent.value })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const newPost = document.createElement('article');
+            newPost.classList.add('post');
+            newPost.id = `post-${data.post.id}`;
+            newPost.innerHTML = `
+                <div class="post-header">
+                    <p class="post-content">${data.post.content}</p>
+                    <div class="post-footer">
+                        <div class="post-meta">
+                            <span class="timestamp">${data.post.timestamp}</span>
+                        </div>
+                        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                            <i class="far fa-comment"></i>
+                            <span>0 comments</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="comments" id="comments-${data.post.id}">
+                    <form class="comment-form" data-post-id="${data.post.id}">
+                        <textarea name="content" placeholder="Write a comment..." required></textarea>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-reply"></i>
+                            Comment
+                        </button>
+                    </form>
+                </div>
+            `;
 
-                        const postsContainer = document.getElementById('postsContainer');
-                        postsContainer.insertBefore(newPost, postsContainer.firstChild);
-                        quill.root.innerHTML = ''; // Clear the Quill editor
-                        postForm.classList.remove('visible');
-                    }
-                    const savedTheme = localStorage.getItem('theme') || 'light';
-    rootElement.setAttribute('data-theme', savedTheme);
-    updateThemeToggleIcon(savedTheme);
+            const postsContainer = document.getElementById('postsContainer');
+            postsContainer.insertBefore(newPost, postsContainer.firstChild);
+
+            // Clear the Quill editor and hide the post form
+            quill.root.innerHTML = '';
+            postForm.classList.remove('visible');
+
+            // Attach comment form handler for the newly added post
+            const newCommentForm = newPost.querySelector('.comment-form');
+            attachCommentFormHandler(newCommentForm);
+        }
+    });
 });
-            });
+
         });
 
         // Theme Toggle
@@ -191,16 +267,26 @@
 });
 
 
-        function updateThemeToggleIcon(theme) {
-            const icon = themeToggleButton.querySelector('i');
-            if (theme === 'dark') {
-                icon.classList.remove('fa-sun');
-                icon.classList.add('fa-moon');
-            } else {
-                icon.classList.remove('fa-moon');
-                icon.classList.add('fa-sun');
-            }
+function updateThemeToggleIcon(theme) {
+    const icon = themeToggleButton.querySelector('i');
+    
+    // Add rotation animation
+    icon.style.transition = 'transform 0.5s ease';
+    icon.style.transform = 'rotate(180deg)';
+    
+    // Wait for the rotation to complete before changing the icon
+    setTimeout(() => {
+        if (theme === 'dark') {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon-stars');
+        } else {
+            icon.classList.remove('fa-moon-stars');
+            icon.classList.add('fa-sun');
         }
+        // Reset rotation for next toggle
+        icon.style.transform = 'rotate(0deg)';
+    }, 250); // Half of the transition time for smooth icon swap
+}
 
         // Post Form Toggle
         const togglePostForm = document.querySelector('.toggle-post-form');

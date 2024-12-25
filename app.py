@@ -61,7 +61,7 @@ def create_post():
         # Create a response version with string timestamp
         response_post = {
             **new_post,
-            'timestamp': new_post['timestamp'].strftime('%B %d, %Y at %I:%M %p')
+            'timestamp': new_post['timestamp'].strftime('%B %d, %Y at %H:%M')  # 24-hour format
         }
         return jsonify({'success': True, 'post': response_post})
     
@@ -81,13 +81,13 @@ def add_comment(post_id):
                 'content': content,
                 'timestamp': datetime.now()
             }
-            post['comments'].append(new_comment)  # Yorum en sona eklenir
+            post['comments'].append(new_comment)  # Add comment to the post
             save_posts(posts)
             
-            # Yanıt için okunabilir zaman formatı ekleme
+            # Create response with readable time format
             response_comment = {
                 **new_comment,
-                'timestamp': new_comment['timestamp'].strftime('%B %d, %Y at %I:%M %p')
+                'timestamp': new_comment['timestamp'].strftime('%B %d, %Y at %H:%M')  # 24-hour format
             }
             return jsonify({'success': True, 'comment': response_comment})
     
