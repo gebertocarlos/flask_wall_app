@@ -378,6 +378,7 @@ body {
     animation: fadeIn 0.2s ease;
 }
 
+/* Base Comment Styles */
 .comment {
     background: var(--surface-hover);
     padding: 1rem;
@@ -385,6 +386,15 @@ body {
     margin-bottom: 1rem;
 }
 
+.comment-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* Comment Form */
 .comment-form textarea {
     width: 100%;
     font-family: 'Poppins', 'Montserrat', 'Arial', sans-serif;
@@ -393,12 +403,12 @@ body {
     border: 1px solid var(--border);
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    resize: vertical; /* Allow vertical resizing */
+    resize: vertical;
     margin-bottom: 1rem;
     background: var(--surface);
     color: var(--text);
-    overflow-y: hidden; /* Hide scrollbar while auto-expanding */
-    transition: height 0.2s ease; /* Smooth height transition */
+    overflow-y: hidden;
+    transition: height 0.2s ease;
 }
 
 .comment-form textarea:focus {
@@ -406,7 +416,7 @@ body {
     border-color: var(--primary);
 }
 
-/* Post Footer */
+/* Post Footer and Actions */
 .post-footer {
     display: flex;
     justify-content: space-between;
@@ -420,96 +430,77 @@ body {
     align-items: center;
 }
 
+/* Like Button Base Styles */
+.like-button-base {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 0.375rem;
+}
+
+.like-button-base i {
+    color: var(--text-secondary);
+    transition: all 0.3s ease;
+}
+
+.like-button-base.liked i {
+    color: var(--primary);
+    transform: scale(1.1);
+}
+
+.like-button-base:hover i {
+    transform: scale(1.1);
+    color: var(--primary-light);
+}
+
+.like-button-base.liked:hover i {
+    animation: thumbsUpBeat 1s infinite;
+    color: var(--primary);
+}
+
+/* Post Like Button */
 .post-like-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
+    composes: like-button-base;
     padding: 0.5rem;
-    border-radius: 0.375rem;
-}
-
-.post-like-btn i {
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
-}
-
-.post-like-btn.liked i {
-    color: var(--primary);  /* Tema rengi */
-    transform: scale(1.1);
-}
-
-.post-like-btn:hover i {
-    transform: scale(1.1);
-    color: var(--primary-light);  /* Hover durumunda daha açık tema rengi */
-}
-
-.post-like-btn.liked:hover i {
-    animation: thumbsUpBeat 1s infinite;
-    color: var(--primary);  /* Beğenilmiş durumda tema rengi */
-}
-
-/* Comment Like Button */
-.comment-like-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    transition: all 0.3s ease;
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    cursor: pointer;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.375rem;
-    font-size: 0.8rem;
-}
-
-.comment-like-btn i {
-    color: var(--text-secondary);
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-}
-
-.comment-like-btn.liked i {
-    color: var(--primary);  /* Tema rengi */
-    transform: scale(1.1);
-}
-
-.comment-like-btn:hover i {
-    transform: scale(1.1);
-    color: var(--primary-light);  /* Hover durumunda daha açık tema rengi */
-}
-
-.comment-like-btn.liked:hover i {
-    animation: thumbsUpBeat 1s infinite;
-    color: var(--primary);  /* Beğenilmiş durumda tema rengi */
-}
-
-.post-like-count, .comment-like-count {
-    color: var(--text-secondary);
 }
 
 .post-like-count {
     font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Comment Like Button */
+.comment-like-btn {
+    composes: like-button-base;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.comment-like-btn i {
+    font-size: 0.8rem;
 }
 
 .comment-like-count {
     font-size: 0.8rem;
+    color: var(--text-secondary);
 }
 
+/* Animations */
 @keyframes thumbsUpBeat {
     0% { transform: scale(1) rotate(0deg); }
     50% { transform: scale(1.2) rotate(10deg); }
     100% { transform: scale(1) rotate(0deg); }
 }
 
+/* Timestamp */
 .timestamp {
     font-size: 12px;
-    color: #666;
+    color: var(--text-secondary);
     text-align-last: right;
     opacity: 0.84;
 }
@@ -540,7 +531,7 @@ body {
     padding: 0.5rem;
     border-radius: 0.375rem;
     font-size: 0.875rem;
-    display: flexbox;
+    display: flex;
     align-items: center;
     gap: 0.25rem;
 }
@@ -548,22 +539,6 @@ body {
 .action-btn:hover {
     background: var(--surface-hover);
     color: var(--primary);
-}
-.like-btn {
-    display: flex;
-    align-items: center;
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
-}
-
-.like-btn.liked i {
-    color: #ff5733; /* Highlight color for liked state */
-}
-
-.like-btn span {
-    margin-left: 5px;
 }
 
 /* Iframe Styles */
@@ -626,47 +601,5 @@ body {
     .post-content iframe,
     .ql-editor iframe {
         max-width: 100%;
-        aspect-ratio: 16 / 9;
     }
-}
-
-.comment {
-    background: var(--surface-hover);
-    padding: 1rem;
-    border-radius: 0.375rem;
-    margin-bottom: 1rem;
-}
-
-.comment-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-}
-
-.comment .like-btn {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.8rem;
-}
-
-.comment .like-btn i {
-    font-size: 0.8rem;
-}
-
-.comment .like-count {
-    font-size: 0.8rem;
-}
-
-.comment .like-btn.liked i {
-    color: #ff4757;
-    transform: scale(1.1);
-}
-
-.comment .like-btn:hover i {
-    transform: scale(1.1);
-}
-
-.comment .like-btn.liked:hover i {
-    animation: heartBeat 1s infinite;
 }
