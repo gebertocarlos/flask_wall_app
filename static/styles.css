@@ -412,12 +412,21 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-top: 10px;
+    gap: 1rem;
 }
 
 .post-actions {
     display: flex;
     gap: 1rem;
     align-items: center;
+    margin-left: auto; /* Sağa hizalama için */
+}
+
+.timestamp {
+    font-size: 12px;
+    color: var(--text-secondary);
+    opacity: 0.84;
+    margin-right: auto; /* Sola hizalama için */
 }
 
 .post-like-btn {
@@ -431,6 +440,11 @@ body {
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 0.375rem;
+    order: 1; /* Like butonunu ortaya almak için */
+}
+
+.action-btn[onclick*="toggleComments"] {
+    order: 2; /* Comment butonunu en sağa almak için */
 }
 
 .post-like-btn i {
@@ -439,18 +453,16 @@ body {
 }
 
 .post-like-btn.liked i {
-    color: var(--primary);  /* Tema rengi */
+    color: #ff4757;
     transform: scale(1.1);
 }
 
 .post-like-btn:hover i {
     transform: scale(1.1);
-    color: var(--primary-light);  /* Hover durumunda daha açık tema rengi */
 }
 
 .post-like-btn.liked:hover i {
-    animation: thumbsUpBeat 1s infinite;
-    color: var(--primary);  /* Beğenilmiş durumda tema rengi */
+    animation: heartBeat 1s infinite;
 }
 
 /* Comment Like Button */
@@ -475,18 +487,16 @@ body {
 }
 
 .comment-like-btn.liked i {
-    color: var(--primary);  /* Tema rengi */
+    color: #ff4757;
     transform: scale(1.1);
 }
 
 .comment-like-btn:hover i {
     transform: scale(1.1);
-    color: var(--primary-light);  /* Hover durumunda daha açık tema rengi */
 }
 
 .comment-like-btn.liked:hover i {
-    animation: thumbsUpBeat 1s infinite;
-    color: var(--primary);  /* Beğenilmiş durumda tema rengi */
+    animation: heartBeat 1s infinite;
 }
 
 .post-like-count, .comment-like-count {
@@ -501,17 +511,10 @@ body {
     font-size: 0.8rem;
 }
 
-@keyframes thumbsUpBeat {
-    0% { transform: scale(1) rotate(0deg); }
-    50% { transform: scale(1.2) rotate(10deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
-
-.timestamp {
-    font-size: 12px;
-    color: #666;
-    text-align-last: right;
-    opacity: 0.84;
+@keyframes heartBeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
 }
 
 /* 8. Utility Classes

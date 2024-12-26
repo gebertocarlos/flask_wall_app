@@ -92,7 +92,7 @@
             <span class="timestamp">{{ post.timestamp }}</span>
             <div class="post-actions">
                 <button class="action-btn post-like-btn {% if request.remote_addr in post.liked_by %}liked{% endif %}" data-post-id="{{ post.id }}">
-                    <i class="fas fa-thumbs-up"></i>
+                    <i class="fas fa-heart"></i>
                     <span class="post-like-count">{{ post.likes|default(0) }}</span>
                 </button>
                 <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
@@ -112,7 +112,7 @@
                     <button class="action-btn comment-like-btn {% if request.remote_addr in comment.liked_by %}liked{% endif %}" 
                             data-post-id="{{ post.id }}" 
                             data-comment-id="{{ comment.id }}">
-                        <i class="fas fa-thumbs-up"></i>
+                        <i class="fas fa-heart"></i>
                         <span class="comment-like-count">{{ comment.likes|default(0) }}</span>
                     </button>
                 </div>
@@ -336,7 +336,7 @@
                         </div>
                         <div class="post-actions">
                             <button class="action-btn post-like-btn" data-post-id="${data.post.id}">
-                                <i class="fas fa-thumbs-up"></i>
+                                <i class="fas fa-heart"></i>
                                 <span class="post-like-count">0</span>
                             </button>
                             <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
@@ -563,7 +563,7 @@ function updateThemeToggleIcon(theme) {
                             <div class="comment-footer">
                                 <span class="timestamp" data-timestamp="${data.comment.timestamp}"></span>
                                 <button class="action-btn comment-like-btn" data-post-id="${postId}" data-comment-id="${data.comment.id}">
-                                    <i class="fas fa-thumbs-up"></i>
+                                    <i class="fas fa-heart"></i>
                                     <span class="comment-like-count">0</span>
                                 </button>
                             </div>
