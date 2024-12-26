@@ -2,9 +2,14 @@ from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 from flask_socketio import SocketIO, emit
 import json
+import os
+import eventlet
+
+eventlet.monkey_patch()
 
 app = Flask(__name__)
-socketio = SocketIO(app, cors_allowed_origins="*")
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key')
+socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # JSON dosyasının yolu
 JSON_FILE = 'posts.json'
@@ -178,4 +183,5 @@ def like_post(post_id):
 # Uygulamanın ana giriş noktası
 # Bu işlev, Flask uygulamasını geliştirme modunda çalıştırır.
 if __name__ == '__main__':
-    socketio.run(app, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    socketio.run(app, host='0.0.0.0', port=port)
