@@ -75,44 +75,149 @@
             </div>
         </div>
 
-        <!-- Posts Section -->
-        <div class="posts-container" id="postsContainer">
-            {% for post in posts %}
-            <article class="post" id="post-{{ post.id }}">
-                <p class="post-content">{{ post.content|safe }}</p>
-                
-                <div class="post-footer">
-                    <span class="timestamp">{{ post.timestamp }}</span>
-                    
-                    <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
-                        <i class="far fa-comment"></i>
-                        <span>{{ post.comments|length }} comments</span>
+<!-- Posts Section -->
+<div class="posts-container" id="postsContainer">
+    {% for post in posts %}
+    <article class="post" id="post-{{ post.id }}">
+        <p class="post-content">{{ post.content|safe }}</p>
+        
+        <!-- Embed Instagram Post -->
+        {% if post.instagram_url %}
+        <div class="instagram-embed">
+            <blockquote class="instagram-media" data-instgrm-captioned data-instgrm-permalink="{{ post.instagram_url }}" style="width: 100%;"></blockquote>
+        </div>
+        {% endif %}
+        
+        <div class="post-footer">
+            <span class="timestamp">{{ post.timestamp }}</span>
+            <div class="post-actions">
+                <button class="action-btn post-like-btn {% if request.remote_addr in post.liked_by %}liked{% endif %}" data-post-id="{{ post.id }}">
+                    <i class="fas fa-heart"></i>
+                    <span class="post-like-count">{{ post.likes|default(0) }}</span>
+                </button>
+                <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
+                    <i class="far fa-comment"></i>
+                    <span>{{ post.comments|length }} comments</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Comments Section -->
+        <div class="comments" id="comments-{{ post.id }}">
+            {% for comment in post.comments %}
+            <div class="comment" id="comment-{{ post.id }}-{{ comment.id }}">
+                <p>{{ comment.content }}</p>
+                <div class="comment-footer">
+                    <span class="timestamp" data-timestamp="{{ comment.timestamp }}"></span>
+                    <button class="action-btn comment-like-btn {% if request.remote_addr in comment.liked_by %}liked{% endif %}" 
+                            data-post-id="{{ post.id }}" 
+                            data-comment-id="{{ comment.id }}">
+                        <i class="fas fa-heart"></i>
+                        <span class="comment-like-count">{{ comment.likes|default(0) }}</span>
                     </button>
                 </div>
-                                <!-- Comments Section -->
-                                <div class="comments" id="comments-{{ post.id }}">
-                                    {% for comment in post.comments %}
-                                    <div class="comment">
-                                        <p>{{ comment.content }}</p>
-                                        <!-- Comment Timestamp -->
-                                        <span class="timestamp" data-timestamp="{{ comment.timestamp }}"></span>
-                                    </div>
-                                    {% endfor %}
-                                    <form class="comment-form" data-post-id="{{ post.id }}">
-                                        <textarea name="content" placeholder="Write a comment..." required></textarea>
-                                        <button type="submit" class="btn">
-                                            <i class="fas fa-reply"></i>
-                                            Comment
-                                        </button>
-                                    </form>
-                                </div>
-                                            </article>
+            </div>
             {% endfor %}
+            <form class="comment-form" data-post-id="{{ post.id }}">
+                <textarea name="content" placeholder="Write a comment..." required></textarea>
+                <button type="submit" class="btn">
+                    <i class="fas fa-reply"></i>
+                    Comment
+                </button>
+            </form>
         </div>
+    </article>
+    {% endfor %}
+</div>
+
+<!-- Instagram Embed Script -->
+<script async src="https://www.instagram.com/embed.js"></script>
     </main>
 
     <script>
-document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener('DOMContentLoaded', function () {
+            // Post like işleyicisi
+            const postLikeButtons = document.querySelectorAll('.post-like-btn');
+            postLikeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const postId = button.getAttribute('data-post-id');
+                    handlePostLike('/like_post/' + postId, button);
+                });
+            });
+
+            // Yorum like işleyicisi
+            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
+            commentLikeButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const postId = button.getAttribute('data-post-id');
+                    const commentId = button.getAttribute('data-comment-id');
+                    handleCommentLike('/like_comment/' + postId + '/' + commentId, button);
+                });
+            });
+
+            // Post like işleme fonksiyonu
+            function handlePostLike(url, button) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const likeCount = button.querySelector('.post-like-count');
+                        likeCount.textContent = data.likes;
+                        if (data.is_liked) {
+                            button.classList.add('liked');
+                        } else {
+                            button.classList.remove('liked');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            // Yorum like işleme fonksiyonu
+            function handleCommentLike(url, button) {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const likeCount = button.querySelector('.comment-like-count');
+                        likeCount.textContent = data.likes;
+                        if (data.is_liked) {
+                            button.classList.add('liked');
+                        } else {
+                            button.classList.remove('liked');
+                        }
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+
+            // Yeni yorum eklendiğinde like işleyicisini ekle
+            function attachCommentLikeHandler(commentElement) {
+                const likeButton = commentElement.querySelector('.comment-like-btn');
+                if (likeButton) {
+                    likeButton.addEventListener('click', function() {
+                        const postId = this.getAttribute('data-post-id');
+                        const commentId = this.getAttribute('data-comment-id');
+                        handleCommentLike('/like_comment/' + postId + '/' + commentId, this);
+                    });
+                }
+            }
+
+            // Mevcut yorumlara like işleyicisi ekle
+            document.querySelectorAll('.comment').forEach(attachCommentLikeHandler);
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
     const posts = document.querySelectorAll('.timestamp');
     
     posts.forEach(post => {
@@ -207,7 +312,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             postForm.addEventListener('submit', (event) => {
     event.preventDefault();
-    quillHiddenContent.value = quill.root.innerHTML; // Get Quill content
+    quillHiddenContent.value = quill.root.innerHTML;
     
     fetch('/create_post', {
         method: 'POST',
@@ -229,10 +334,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         <div class="post-meta">
                             <span class="timestamp">${data.post.timestamp}</span>
                         </div>
-                        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                            <i class="far fa-comment"></i>
-                            <span>0 comments</span>
-                        </button>
+                        <div class="post-actions">
+                            <button class="action-btn post-like-btn" data-post-id="${data.post.id}">
+                                <i class="fas fa-heart"></i>
+                                <span class="post-like-count">0</span>
+                            </button>
+                            <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                                <i class="far fa-comment"></i>
+                                <span>0 comments</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
                 <div class="comments" id="comments-${data.post.id}">
@@ -256,6 +367,13 @@ document.addEventListener("DOMContentLoaded", function () {
             // Attach comment form handler for the newly added post
             const newCommentForm = newPost.querySelector('.comment-form');
             attachCommentFormHandler(newCommentForm);
+
+            // Attach like button handler
+            const newLikeButton = newPost.querySelector('.post-like-btn');
+            newLikeButton.addEventListener('click', function() {
+                const postId = this.getAttribute('data-post-id');
+                handlePostLike('/like_post/' + postId, this);
+            });
         }
     });
 });
@@ -439,17 +557,37 @@ function updateThemeToggleIcon(theme) {
                     if (data.success) {
                         const newComment = document.createElement('div');
                         newComment.classList.add('comment');
-                        newComment.innerHTML = `<p>${data.comment.content}</p>`;
+                        newComment.id = `comment-${postId}-${data.comment.id}`;
+                        newComment.innerHTML = `
+                            <p>${data.comment.content}</p>
+                            <div class="comment-footer">
+                                <span class="timestamp" data-timestamp="${data.comment.timestamp}"></span>
+                                <button class="action-btn comment-like-btn" data-post-id="${postId}" data-comment-id="${data.comment.id}">
+                                    <i class="fas fa-heart"></i>
+                                    <span class="comment-like-count">0</span>
+                                </button>
+                            </div>
+                        `;
 
                         const commentsSection = document.getElementById(`comments-${postId}`);
                         const commentForm = commentsSection.querySelector('.comment-form');
                         commentsSection.insertBefore(newComment, commentForm);
 
+                        // Yorum sayısını güncelle
                         const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
                         const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
                         commentButton.textContent = `${currentCount + 1} comments`;
 
-                        form.querySelector('textarea').value = ''; // Clear comment input
+                        // Yorum formunu temizle
+                        form.querySelector('textarea').value = '';
+
+                        // Yeni yorum için like butonuna event listener ekle
+                        const newCommentLikeButton = newComment.querySelector('.comment-like-btn');
+                        newCommentLikeButton.addEventListener('click', function() {
+                            const postId = this.getAttribute('data-post-id');
+                            const commentId = this.getAttribute('data-comment-id');
+                            handleCommentLike('/like_comment/' + postId + '/' + commentId, this);
+                        });
                     }
                 });
             });

@@ -5,10 +5,17 @@
         "timestamp": "2024-12-24 17:43:47.243534",
         "comments": [
             {
+                "id": 1,
                 "content": "very good ",
-                "timestamp": "2024-12-25 02:08:12.759005"
+                "timestamp": "2024-12-25 02:08:12.759005",
+                "likes": 0,
+                "liked_by": []
             }
-        ]
+        ],
+        "liked_by": [
+            "127.0.0.1"
+        ],
+        "likes": 1
     },
     {
         "id": 2,
@@ -16,17 +23,39 @@
         "timestamp": "2024-12-24 19:46:18.770622",
         "comments": [
             {
+                "id": 1,
                 "content": "good content",
-                "timestamp": "2024-12-24 20:34:51.408864"
+                "timestamp": "2024-12-24 20:34:51.408864",
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ]
             },
             {
+                "id": 2,
                 "content": "thank you",
-                "timestamp": "2024-12-25 02:25:16.587009"
+                "timestamp": "2024-12-25 02:25:16.587009",
+                "likes": 0,
+                "liked_by": []
             },
             {
+                "id": 3,
                 "content": "\ud83d\udc4d",
-                "timestamp": "2024-12-25 03:27:32.819058"
+                "timestamp": "2024-12-25 03:27:32.819058",
+                "likes": 0,
+                "liked_by": []
+            },
+            {
+                "id": 4,
+                "content": "great ",
+                "timestamp": "2024-12-26 03:05:27.086682",
+                "likes": 0,
+                "liked_by": []
             }
-        ]
+        ],
+        "liked_by": [
+            "127.0.0.1"
+        ],
+        "likes": 1
     }
 ]
