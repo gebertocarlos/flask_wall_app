@@ -16,42 +16,201 @@
    ========================================================================== */
    :root {
     /* Primary Colors */
-    --primary: #4338ca;
-    --primary-dark: #3730a3;
-    --primary-light: #6366f1;
+    --primary: #6366f1;  /* Modern indigo */
+    --primary-dark: #4f46e5;
+    --primary-light: #818cf8;
 
-    /* Surface Colors */
-    --surface: #f8fafc;
-    --surface-hover: #f1f5f9;
-    --surface-alt: #ffffff;
-
-    /* Border and Text */
-    --border: #cbd5e1;
-    --text: #0f172a;
-    --text-secondary: #475569;
-
-    /* Shadow System */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-    --shadow: 0 4px 6px rgba(15, 23, 42, 0.08);
-    --shadow-md: 0 8px 16px rgba(15, 23, 42, 0.12);
+    /* Surface Colors - Light Theme */
+    --surface: #ffffff;
+    --surface-hover: #f8fafc;
+    --surface-alt: #f1f5f9;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-secondary: #64748b;
 }
 
 /* Dark Theme */
 [data-theme="dark"] {
-    /* Primary Colors */
+    /* Surface Colors - Dark Theme */
+    --surface: #0f172a;
+    --surface-hover: #1e293b;
+    --surface-alt: #334155;
+    --border: #475569;
+    --text: #f8fafc;
+    --text-secondary: #94a3b8;
+
+    /* Primary Colors - Adjusted for Dark Theme */
     --primary: #818cf8;
     --primary-dark: #6366f1;
     --primary-light: #a5b4fc;
+}
 
-    /* Surface Colors */
-    --surface: #0f172a;
-    --surface-hover: #1e293b;
-    --surface-alt: #1e293b;
+/* Base Styles */
+body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: 'Poppins', sans-serif;
+    line-height: 1.6;
+}
 
-    /* Border and Text */
-    --border: #334155;
-    --text: #f8fafc;
-    --text-secondary: #cbd5e1;
+/* Navbar Styles */
+.navbar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Post Styles */
+.post {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.post:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Comment Styles */
+.comment {
+    background: var(--surface-alt);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    margin: 0.75rem 0;
+    transition: transform 0.2s ease;
+}
+
+.comment:hover {
+    transform: translateY(-1px);
+}
+
+/* Button Styles */
+.btn {
+    background: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Like Button Styles */
+.post-like-btn, .comment-like-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface-alt);
+}
+
+.post-like-btn:hover, .comment-like-btn:hover {
+    background: var(--surface-hover);
+    transform: translateY(-1px);
+}
+
+.post-like-btn.liked, .comment-like-btn.liked {
+    background: var(--primary);
+    color: white;
+}
+
+.post-like-btn.liked i, .comment-like-btn.liked i {
+    color: white;
+}
+
+/* Form Styles */
+.comment-form textarea {
+    width: 100%;
+    border: 2px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1rem;
+    background: var(--surface);
+    color: var(--text);
+    transition: all 0.3s ease;
+    resize: vertical;
+    min-height: 80px;
+}
+
+.comment-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Animation */
+@keyframes thumbsUpBeat {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Timestamp */
+.timestamp {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Post Actions */
+.post-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Comments Section */
+.comments {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .post, .comment {
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .btn {
+        padding: 0.5rem 1rem;
+    }
+}
+
+/* Editor Styles */
+.ql-editor {
+    background: var(--surface);
+    border-radius: 0.75rem;
+    min-height: 150px;
+}
+
+.ql-toolbar {
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+    border-color: var(--border) !important;
+    background: var(--surface-alt);
+}
+
+.ql-container {
+    border-bottom-left-radius: 0.75rem;
+    border-bottom-right-radius: 0.75rem;
+    border-color: var(--border) !important;
 }
 
 /* 2. Reset & Base Styles

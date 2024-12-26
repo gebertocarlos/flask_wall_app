@@ -91,7 +91,7 @@
         <div class="post-footer">
             <span class="timestamp">{{ post.timestamp }}</span>
             <div class="post-actions">
-                <button class="action-btn post-like-btn {% if request.remote_addr in post.liked_by %}liked{% endif %}" data-post-id="{{ post.id }}">
+                <button class="action-btn post-like-btn {% if post.is_liked %}liked{% endif %}" data-post-id="{{ post.id }}">
                     <i class="fas fa-thumbs-up"></i>
                     <span class="post-like-count">{{ post.likes|default(0) }}</span>
                 </button>
@@ -109,7 +109,7 @@
                 <p>{{ comment.content }}</p>
                 <div class="comment-footer">
                     <span class="timestamp" data-timestamp="{{ comment.timestamp }}"></span>
-                    <button class="action-btn comment-like-btn {% if request.remote_addr in comment.liked_by %}liked{% endif %}" 
+                    <button class="action-btn comment-like-btn {% if comment.is_liked %}liked{% endif %}" 
                             data-post-id="{{ post.id }}" 
                             data-comment-id="{{ comment.id }}">
                         <i class="fas fa-thumbs-up"></i>
@@ -136,85 +136,237 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Post like işleyicisi
-            const postLikeButtons = document.querySelectorAll('.post-like-btn');
-            postLikeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const postId = button.getAttribute('data-post-id');
-                    handlePostLike('/like_post/' + postId, button);
-                });
-            });
+            // Event listener'ları tek bir kez eklemek için
+            const addedListeners = new Set();
 
-            // Yorum like işleyicisi
-            const commentLikeButtons = document.querySelectorAll('.comment-like-btn');
-            commentLikeButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const postId = button.getAttribute('data-post-id');
-                    const commentId = button.getAttribute('data-comment-id');
-                    handleCommentLike('/like_comment/' + postId + '/' + commentId, button);
-                });
-            });
+            // Post ve Comment Like Sistemleri
+            const PostLikeHandler = {
+                processing: new Set(),
 
-            // Post like işleme fonksiyonu
-            function handlePostLike(url, button) {
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const likeCount = button.querySelector('.post-like-count');
-                        likeCount.textContent = data.likes;
-                        if (data.is_liked) {
-                            button.classList.add('liked');
-                        } else {
-                            button.classList.remove('liked');
+                async handleLike(button) {
+                    const postId = button.dataset.postId;
+                    if (this.processing.has(postId)) return;
+                    
+                    this.processing.add(postId);
+                    
+                    try {
+                        const response = await fetch(`/like_post/${postId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            const counter = button.querySelector('.post-like-count');
+                            if (counter) counter.textContent = data.likes;
+                            
+                            if (data.is_liked) {
+                                button.classList.add('liked');
+                            } else {
+                                button.classList.remove('liked');
+                            }
                         }
+                    } catch (error) {
+                        console.error('Post like hatası:', error);
+                    } finally {
+                        this.processing.delete(postId);
                     }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-
-            // Yorum like işleme fonksiyonu
-            function handleCommentLike(url, button) {
-                fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const likeCount = button.querySelector('.comment-like-count');
-                        likeCount.textContent = data.likes;
-                        if (data.is_liked) {
-                            button.classList.add('liked');
-                        } else {
-                            button.classList.remove('liked');
-                        }
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-
-            // Yeni yorum eklendiğinde like işleyicisini ekle
-            function attachCommentLikeHandler(commentElement) {
-                const likeButton = commentElement.querySelector('.comment-like-btn');
-                if (likeButton) {
-                    likeButton.addEventListener('click', function() {
-                        const postId = this.getAttribute('data-post-id');
-                        const commentId = this.getAttribute('data-comment-id');
-                        handleCommentLike('/like_comment/' + postId + '/' + commentId, this);
-                    });
                 }
+            };
+
+            const CommentLikeHandler = {
+                processing: new Set(),
+
+                async handleLike(button) {
+                    const postId = button.dataset.postId;
+                    const commentId = button.dataset.commentId;
+                    const key = `${postId}-${commentId}`;
+                    
+                    if (this.processing.has(key)) return;
+                    
+                    this.processing.add(key);
+                    
+                    try {
+                        const response = await fetch(`/like_comment/${postId}/${commentId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            const counter = button.querySelector('.comment-like-count');
+                            if (counter) counter.textContent = data.likes;
+                            
+                            if (data.is_liked) {
+                                button.classList.add('liked');
+                            } else {
+                                button.classList.remove('liked');
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Yorum like hatası:', error);
+                    } finally {
+                        this.processing.delete(key);
+                    }
+                }
+            };
+
+            // Event Listeners
+            document.addEventListener('DOMContentLoaded', function() {
+                // Post Like Listener
+                document.body.addEventListener('click', async function(event) {
+                    const postLikeBtn = event.target.closest('.post-like-btn');
+                    if (postLikeBtn) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        await PostLikeHandler.handleLike(postLikeBtn);
+                    }
+                });
+
+                // Comment Like Listener
+                document.body.addEventListener('click', async function(event) {
+                    const commentLikeBtn = event.target.closest('.comment-like-btn');
+                    if (commentLikeBtn) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        await CommentLikeHandler.handleLike(commentLikeBtn);
+                    }
+                });
+            });
+
+            // Yeni post oluşturulduğunda
+            postForm.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                quillHiddenContent.value = quill.root.innerHTML;
+                
+                try {
+                    const response = await fetch('/create_post', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ content: quillHiddenContent.value })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        const newPost = document.createElement('article');
+                        newPost.classList.add('post');
+                        newPost.id = `post-${data.post.id}`;
+                        newPost.innerHTML = `
+                            <div class="post-header">
+                                <p class="post-content">${data.post.content}</p>
+                                <div class="post-footer">
+                                    <div class="post-meta">
+                                        <span class="timestamp">${data.post.timestamp}</span>
+                                    </div>
+                                    <div class="post-actions">
+                                        <button class="action-btn post-like-btn" data-post-id="${data.post.id}">
+                                            <i class="fas fa-thumbs-up"></i>
+                                            <span class="post-like-count">0</span>
+                                        </button>
+                                        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                                            <i class="far fa-comment"></i>
+                                            <span>0 comments</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="comments" id="comments-${data.post.id}">
+                                <form class="comment-form" data-post-id="${data.post.id}">
+                                    <textarea name="content" placeholder="Write a comment..." required></textarea>
+                                    <button type="submit" class="btn">
+                                        <i class="fas fa-reply"></i>
+                                        Comment
+                                    </button>
+                                </form>
+                            </div>
+                        `;
+
+                        const postsContainer = document.getElementById('postsContainer');
+                        postsContainer.insertBefore(newPost, postsContainer.firstChild);
+
+                        // Quill editörünü temizle ve formu gizle
+                        quill.root.innerHTML = '';
+                        postForm.classList.remove('visible');
+
+                        // Yeni post için yorum formunu ekle
+                        const newCommentForm = newPost.querySelector('.comment-form');
+                        attachCommentFormHandler(newCommentForm);
+                    }
+                } catch (error) {
+                    console.error('Post oluşturma hatası:', error);
+                }
+            });
+
+            // Yeni yorum eklendiğinde
+            function attachCommentFormHandler(form) {
+                form.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    const postId = form.getAttribute('data-post-id');
+                    const content = form.querySelector('textarea').value;
+
+                    try {
+                        const response = await fetch(`/add_comment/${postId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ content })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (data.success) {
+                            const newComment = document.createElement('div');
+                            newComment.classList.add('comment');
+                            newComment.id = `comment-${postId}-${data.comment.id}`;
+                            newComment.innerHTML = `
+                                <p>${data.comment.content}</p>
+                                <div class="comment-footer">
+                                    <span class="timestamp" data-timestamp="${data.comment.timestamp}"></span>
+                                    <button class="action-btn comment-like-btn" data-post-id="${postId}" data-comment-id="${data.comment.id}">
+                                        <i class="fas fa-thumbs-up"></i>
+                                        <span class="comment-like-count">0</span>
+                                    </button>
+                                </div>
+                            `;
+
+                            const commentsSection = document.getElementById(`comments-${postId}`);
+                            const commentForm = commentsSection.querySelector('.comment-form');
+                            commentsSection.insertBefore(newComment, commentForm);
+
+                            // Yorum sayısını güncelle
+                            const commentButton = document.querySelector(`#post-${postId} .action-btn span`);
+                            const currentCount = parseInt(commentButton.textContent.split(' ')[0]);
+                            commentButton.textContent = `${currentCount + 1} comments`;
+
+                            // Formu temizle
+                            form.querySelector('textarea').value = '';
+                        }
+                    } catch (error) {
+                        console.error('Yorum ekleme hatası:', error);
+                    }
+                });
             }
 
-            // Mevcut yorumlara like işleyicisi ekle
-            document.querySelectorAll('.comment').forEach(attachCommentLikeHandler);
+            // Initialize comment form handlers
+            document.querySelectorAll('.comment-form').forEach(attachCommentFormHandler);
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const textareas = document.querySelectorAll('.comment-form textarea');
+                
+                textareas.forEach(textarea => {
+                    // Set initial height
+                    textarea.style.height = 'auto';
+                    textarea.style.height = textarea.scrollHeight + 'px';
+                    
+                    // Add input event listener
+                    textarea.addEventListener('input', function() {
+                        this.style.height = 'auto';
+                        this.style.height = this.scrollHeight + 'px';
+                    });
+                });
+            });
         });
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -388,12 +540,12 @@ const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
 const themeColors = {
     light: {
-        background: "#f8fafc",
-        theme: "#f8fafc",
+        background: "#f8fafc", // --surface from light theme
+        theme: "#f8fafc",   // --primary from light theme
     },
     dark: {
-        background: "#1e293b",
-        theme: "#1e293b"
+        background: "#1e293b", // --surface from dark theme
+        theme: "#1e293b"     // --primary from dark theme
     }
 };
 
@@ -407,7 +559,7 @@ async function updateManifest(theme) {
             display: "standalone",
             background_color: themeColors[theme].background,
             theme_color: themeColors[theme].theme,
-            icons: []
+            icons: [] // Your icons array
         };
 
         const manifestBlob = new Blob(
@@ -416,9 +568,14 @@ async function updateManifest(theme) {
         );
 
         const manifestURL = URL.createObjectURL(manifestBlob);
+        
+        // Update manifest link
         manifestLink.href = manifestURL;
+        
+        // Update theme-color meta tag
         metaThemeColor.content = themeColors[theme].theme;
 
+        // Clean up old URL if exists
         if (window.currentManifestURL) {
             URL.revokeObjectURL(window.currentManifestURL);
         }
@@ -431,66 +588,49 @@ async function updateManifest(theme) {
 
 // Initialize theme
 function initializeTheme() {
-    // Sistem temasını kontrol et
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('theme');
-    
-    // Eğer kullanıcı daha önce tema seçmediyse sistem temasını kullan
-    if (!savedTheme) {
-        setTheme(prefersDark ? 'dark' : 'light');
-    } else {
-        setTheme(savedTheme);
-    }
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
 
-    // Sistem teması değişikliklerini dinle
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-        // Sadece kullanıcı manuel tema seçimi yapmadıysa sistem temasını uygula
-        if (!localStorage.getItem('theme')) {
-            setTheme(e.matches ? 'dark' : 'light');
-        }
-    });
+    setTheme(initialTheme);
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)')
+        .addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
 }
 
 // Set theme function
 async function setTheme(theme) {
     rootElement.setAttribute('data-theme', theme);
-    // Sadece manuel tema değişikliklerinde localStorage'a kaydet
-    if (theme !== (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) {
-        localStorage.setItem('theme', theme);
-    } else {
-        localStorage.removeItem('theme'); // Sistem temasıyla aynıysa kaydı sil
-    }
+    localStorage.setItem('theme', theme);
     updateThemeToggleIcon(theme);
     await updateManifest(theme);
 }
 
-// Theme toggle handler
+// Update your existing theme toggle handler
 themeToggleButton.addEventListener('click', () => {
     const currentTheme = rootElement.getAttribute('data-theme');
-    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    
-    // Eğer yeni tema sistem temasıyla aynıysa localStorage'dan tema tercihini kaldır
-    if (newTheme === systemTheme) {
-        localStorage.removeItem('theme');
-    } else {
-        localStorage.setItem('theme', newTheme);
-    }
-    
     setTheme(newTheme);
 });
 
+// Your existing updateThemeToggleIcon function
 function updateThemeToggleIcon(theme) {
     const icon = themeToggleButton.querySelector('i');
+    
     icon.style.transition = 'transform 0.5s ease';
     icon.style.transform = 'rotate(180deg)';
     
     setTimeout(() => {
         if (theme === 'dark') {
             icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon');
+            icon.classList.add('fa-moon-stars');
         } else {
-            icon.classList.remove('fa-moon');
+            icon.classList.remove('fa-moon-stars');
             icon.classList.add('fa-sun');
         }
         icon.style.transform = 'rotate(0deg)';
@@ -499,6 +639,27 @@ function updateThemeToggleIcon(theme) {
 
 // Initialize theme when the page loads
 document.addEventListener('DOMContentLoaded', initializeTheme);
+
+function updateThemeToggleIcon(theme) {
+    const icon = themeToggleButton.querySelector('i');
+    
+    // Add rotation animation
+    icon.style.transition = 'transform 0.5s ease';
+    icon.style.transform = 'rotate(180deg)';
+    
+    // Wait for the rotation to complete before changing the icon
+    setTimeout(() => {
+        if (theme === 'dark') {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon-stars');
+        } else {
+            icon.classList.remove('fa-moon-stars');
+            icon.classList.add('fa-sun');
+        }
+        // Reset rotation for next toggle
+        icon.style.transform = 'rotate(0deg)';
+    }, 250); // Half of the transition time for smooth icon swap
+}
 
         // Post Form Toggle
         const togglePostForm = document.querySelector('.toggle-post-form');
@@ -572,13 +733,8 @@ document.addEventListener('DOMContentLoaded', initializeTheme);
                         // Yorum formunu temizle
                         form.querySelector('textarea').value = '';
 
-                        // Yeni yorum için like butonuna event listener ekle
-                        const newCommentLikeButton = newComment.querySelector('.comment-like-btn');
-                        newCommentLikeButton.addEventListener('click', function() {
-                            const postId = this.getAttribute('data-post-id');
-                            const commentId = this.getAttribute('data-comment-id');
-                            handleCommentLike('/like_comment/' + postId + '/' + commentId, this);
-                        });
+                        // Yeni yorum için like işleyicisini ekle
+                        attachCommentLikeHandler(newComment);
                     }
                 });
             });
