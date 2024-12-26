@@ -9,13 +9,15 @@
                 "content": "very good ",
                 "timestamp": "2024-12-25 02:08:12.759005",
                 "likes": 0,
-                "liked_by": []
+                "liked_by": [],
+                "is_liked": false
             }
         ],
         "liked_by": [
             "127.0.0.1"
         ],
-        "likes": 1
+        "likes": 1,
+        "is_liked": true
     },
     {
         "id": 2,
@@ -29,33 +31,38 @@
                 "likes": 1,
                 "liked_by": [
                     "127.0.0.1"
-                ]
+                ],
+                "is_liked": true
             },
             {
                 "id": 2,
                 "content": "thank you",
                 "timestamp": "2024-12-25 02:25:16.587009",
                 "likes": 0,
-                "liked_by": []
+                "liked_by": [],
+                "is_liked": false
             },
             {
                 "id": 3,
                 "content": "\ud83d\udc4d",
                 "timestamp": "2024-12-25 03:27:32.819058",
                 "likes": 0,
-                "liked_by": []
+                "liked_by": [],
+                "is_liked": false
             },
             {
                 "id": 4,
                 "content": "great ",
                 "timestamp": "2024-12-26 03:05:27.086682",
                 "likes": 0,
-                "liked_by": []
+                "liked_by": [],
+                "is_liked": false
             }
         ],
         "liked_by": [
             "127.0.0.1"
         ],
-        "likes": 1
+        "likes": 1,
+        "is_liked": true
     }
 ]
