@@ -439,16 +439,18 @@ body {
 }
 
 .post-like-btn.liked i {
-    color: #ff4757;
+    color: var(--primary);  /* Tema rengi */
     transform: scale(1.1);
 }
 
 .post-like-btn:hover i {
     transform: scale(1.1);
+    color: var(--primary-light);  /* Hover durumunda daha açık tema rengi */
 }
 
 .post-like-btn.liked:hover i {
-    animation: heartBeat 1s infinite;
+    animation: thumbsUpBeat 1s infinite;
+    color: var(--primary);  /* Beğenilmiş durumda tema rengi */
 }
 
 /* Comment Like Button */
@@ -473,16 +475,18 @@ body {
 }
 
 .comment-like-btn.liked i {
-    color: #ff4757;
+    color: var(--primary);  /* Tema rengi */
     transform: scale(1.1);
 }
 
 .comment-like-btn:hover i {
     transform: scale(1.1);
+    color: var(--primary-light);  /* Hover durumunda daha açık tema rengi */
 }
 
 .comment-like-btn.liked:hover i {
-    animation: heartBeat 1s infinite;
+    animation: thumbsUpBeat 1s infinite;
+    color: var(--primary);  /* Beğenilmiş durumda tema rengi */
 }
 
 .post-like-count, .comment-like-count {
@@ -497,10 +501,10 @@ body {
     font-size: 0.8rem;
 }
 
-@keyframes heartBeat {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
+@keyframes thumbsUpBeat {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
 }
 
 .timestamp {
