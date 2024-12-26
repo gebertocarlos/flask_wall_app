@@ -388,12 +388,12 @@ const metaThemeColor = document.querySelector('meta[name="theme-color"]');
 
 const themeColors = {
     light: {
-        background: "#f8fafc", // --surface from light theme
-        theme: "#f8fafc",   // --primary from light theme
+        background: "#f8fafc",
+        theme: "#f8fafc",
     },
     dark: {
-        background: "#1e293b", // --surface from dark theme
-        theme: "#1e293b"     // --primary from dark theme
+        background: "#1e293b",
+        theme: "#1e293b"
     }
 };
 
@@ -407,7 +407,7 @@ async function updateManifest(theme) {
             display: "standalone",
             background_color: themeColors[theme].background,
             theme_color: themeColors[theme].theme,
-            icons: [] // Your icons array
+            icons: []
         };
 
         const manifestBlob = new Blob(
@@ -416,14 +416,9 @@ async function updateManifest(theme) {
         );
 
         const manifestURL = URL.createObjectURL(manifestBlob);
-        
-        // Update manifest link
         manifestLink.href = manifestURL;
-        
-        // Update theme-color meta tag
         metaThemeColor.content = themeColors[theme].theme;
 
-        // Clean up old URL if exists
         if (window.currentManifestURL) {
             URL.revokeObjectURL(window.currentManifestURL);
         }
@@ -436,49 +431,66 @@ async function updateManifest(theme) {
 
 // Initialize theme
 function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme');
+    // Sistem temasını kontrol et
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    const savedTheme = localStorage.getItem('theme');
+    
+    // Eğer kullanıcı daha önce tema seçmediyse sistem temasını kullan
+    if (!savedTheme) {
+        setTheme(prefersDark ? 'dark' : 'light');
+    } else {
+        setTheme(savedTheme);
+    }
 
-    setTheme(initialTheme);
-
-    // Listen for system theme changes
-    window.matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (e) => {
-            if (!localStorage.getItem('theme')) {
-                setTheme(e.matches ? 'dark' : 'light');
-            }
-        });
+    // Sistem teması değişikliklerini dinle
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        // Sadece kullanıcı manuel tema seçimi yapmadıysa sistem temasını uygula
+        if (!localStorage.getItem('theme')) {
+            setTheme(e.matches ? 'dark' : 'light');
+        }
+    });
 }
 
 // Set theme function
 async function setTheme(theme) {
     rootElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    // Sadece manuel tema değişikliklerinde localStorage'a kaydet
+    if (theme !== (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) {
+        localStorage.setItem('theme', theme);
+    } else {
+        localStorage.removeItem('theme'); // Sistem temasıyla aynıysa kaydı sil
+    }
     updateThemeToggleIcon(theme);
     await updateManifest(theme);
 }
 
-// Update your existing theme toggle handler
+// Theme toggle handler
 themeToggleButton.addEventListener('click', () => {
     const currentTheme = rootElement.getAttribute('data-theme');
+    const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    // Eğer yeni tema sistem temasıyla aynıysa localStorage'dan tema tercihini kaldır
+    if (newTheme === systemTheme) {
+        localStorage.removeItem('theme');
+    } else {
+        localStorage.setItem('theme', newTheme);
+    }
+    
     setTheme(newTheme);
 });
 
-// Your existing updateThemeToggleIcon function
 function updateThemeToggleIcon(theme) {
     const icon = themeToggleButton.querySelector('i');
-    
     icon.style.transition = 'transform 0.5s ease';
     icon.style.transform = 'rotate(180deg)';
     
     setTimeout(() => {
         if (theme === 'dark') {
             icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon-stars');
+            icon.classList.add('fa-moon');
         } else {
-            icon.classList.remove('fa-moon-stars');
+            icon.classList.remove('fa-moon');
             icon.classList.add('fa-sun');
         }
         icon.style.transform = 'rotate(0deg)';
@@ -487,27 +499,6 @@ function updateThemeToggleIcon(theme) {
 
 // Initialize theme when the page loads
 document.addEventListener('DOMContentLoaded', initializeTheme);
-
-function updateThemeToggleIcon(theme) {
-    const icon = themeToggleButton.querySelector('i');
-    
-    // Add rotation animation
-    icon.style.transition = 'transform 0.5s ease';
-    icon.style.transform = 'rotate(180deg)';
-    
-    // Wait for the rotation to complete before changing the icon
-    setTimeout(() => {
-        if (theme === 'dark') {
-            icon.classList.remove('fa-sun');
-            icon.classList.add('fa-moon-stars');
-        } else {
-            icon.classList.remove('fa-moon-stars');
-            icon.classList.add('fa-sun');
-        }
-        // Reset rotation for next toggle
-        icon.style.transform = 'rotate(0deg)';
-    }, 250); // Half of the transition time for smooth icon swap
-}
 
         // Post Form Toggle
         const togglePostForm = document.querySelector('.toggle-post-form');
