@@ -1,15 +1,8 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
-from flask_socketio import SocketIO, emit
 import json
-import os
-import eventlet
-
-eventlet.monkey_patch()
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'default-secret-key')
-socketio = SocketIO(app, cors_allowed_origins="*", async_mode='eventlet')
 
 # JSON dosyasının yolu
 JSON_FILE = 'posts.json'
@@ -105,12 +98,6 @@ def add_comment(post_id):
                 **new_comment,
                 'timestamp': new_comment['timestamp'].strftime('%B %d, %Y at %H:%M')
             }
-            # WebSocket ile tüm bağlı clientlara yeni yorum bilgisini gönder
-            socketio.emit('new_comment', {
-                'post_id': post_id,
-                'comment': response_comment,
-                'comment_count': len(post['comments'])
-            })
             return jsonify({'success': True, 'comment': response_comment})
     
     return jsonify({'success': False, 'message': 'Comment could not be added'}), 400
@@ -138,13 +125,6 @@ def like_comment(post_id, comment_id):
                 comment['liked_by'].append(user_ip)
                 
             save_posts(posts)
-            # WebSocket ile tüm bağlı clientlara yorum like güncellemesini gönder
-            socketio.emit('comment_like_update', {
-                'post_id': post_id,
-                'comment_id': comment_id,
-                'likes': comment['likes'],
-                'is_liked': user_ip in comment['liked_by']
-            })
             return jsonify({'success': True, 'likes': comment['likes'], 'is_liked': user_ip in comment['liked_by']})
                 
     return jsonify({'success': False, 'message': 'Comment not found'}), 404
@@ -170,12 +150,6 @@ def like_post(post_id):
             post['liked_by'].append(user_ip)
             
         save_posts(posts)
-        # WebSocket ile tüm bağlı clientlara like güncellemesini gönder
-        socketio.emit('post_like_update', {
-            'post_id': post_id,
-            'likes': post['likes'],
-            'is_liked': user_ip in post['liked_by']
-        })
         return jsonify({'success': True, 'likes': post['likes'], 'is_liked': user_ip in post['liked_by']})
     
     return jsonify({'success': False, 'message': 'Post not found'}), 404
@@ -183,5 +157,4 @@ def like_post(post_id):
 # Uygulamanın ana giriş noktası
 # Bu işlev, Flask uygulamasını geliştirme modunda çalıştırır.
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    socketio.run(app, host='0.0.0.0', port=port)
+    app.run()

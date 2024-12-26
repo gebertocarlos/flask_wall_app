@@ -38,8 +38,10 @@
                 "id": 2,
                 "content": "thank you",
                 "timestamp": "2024-12-25 02:25:16.587009",
-                "likes": 0,
-                "liked_by": [],
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ],
                 "is_liked": false
             },
             {
