@@ -1,7 +1,11 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # exit on error
 set -o errexit
 
+# Python sürümünü kontrol et ve kur
+python3 -m pip install --upgrade pip
+
+# Bağımlılıkları yükle
 pip install -r requirements.txt
 
 # JSON dosyasını oluştur (eğer yoksa)
