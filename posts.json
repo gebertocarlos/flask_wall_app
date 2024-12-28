@@ -8,13 +8,17 @@
                 "id": 1,
                 "content": "very good ",
                 "timestamp": "2024-12-25 02:08:12.759005",
-                "likes": 0,
-                "liked_by": [],
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ],
                 "is_liked": false
             }
         ],
-        "liked_by": [],
-        "likes": 0,
+        "liked_by": [
+            "127.0.0.1"
+        ],
+        "likes": 1,
         "is_liked": true
     },
     {
@@ -26,16 +30,20 @@
                 "id": 1,
                 "content": "good content",
                 "timestamp": "2024-12-24 20:34:51.408864",
-                "likes": 0,
-                "liked_by": [],
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ],
                 "is_liked": true
             },
             {
                 "id": 2,
                 "content": "thank you",
                 "timestamp": "2024-12-25 02:25:16.587009",
-                "likes": 0,
-                "liked_by": [],
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ],
                 "is_liked": false
             },
             {

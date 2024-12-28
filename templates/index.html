@@ -67,10 +67,16 @@
                 <form id="postForm">
                     <input type="hidden" name="content" id="quillHiddenContent">
                     <div id="quill-editor"></div>
-                    <button type="submit" class="btn">
-                        <i class="fas fa-paper-plane"></i>
-                        Share Post
-                    </button>
+                    <div class="form-actions">
+                        <button type="button" class="emoji-trigger btn-icon" onclick="toggleEmojiPicker('post')">
+                            <i class="far fa-smile"></i>
+                        </button>
+                        <button type="submit" class="btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Paylaş
+                        </button>
+                    </div>
+                    <div id="postEmojiPicker" class="emoji-picker"></div>
                 </form>
             </div>
         </div>
@@ -92,7 +98,7 @@
             <span class="timestamp">{{ post.timestamp }}</span>
             <div class="post-actions">
                 <button class="action-btn post-like-btn {% if request.remote_addr in post.liked_by %}liked{% endif %}" data-post-id="{{ post.id }}">
-                    <i class="fas fa-heart"></i>
+                    <i class="fas fa-thumbs-up"></i>
                     <span class="post-like-count">{{ post.likes|default(0) }}</span>
                 </button>
                 <button class="action-btn" onclick="toggleComments('comments-{{ post.id }}')">
@@ -112,17 +118,23 @@
                     <button class="action-btn comment-like-btn {% if request.remote_addr in comment.liked_by %}liked{% endif %}" 
                             data-post-id="{{ post.id }}" 
                             data-comment-id="{{ comment.id }}">
-                        <i class="fas fa-heart"></i>
+                        <i class="fas fa-thumbs-up"></i>
                         <span class="comment-like-count">{{ comment.likes|default(0) }}</span>
                     </button>
                 </div>
             </div>
             {% endfor %}
             <form class="comment-form" data-post-id="{{ post.id }}">
-                <textarea name="content" placeholder="Write a comment..." required></textarea>
+                <div class="comment-input-wrapper">
+                    <textarea name="content" placeholder="Bir yorum yazın..." required></textarea>
+                    <button type="button" class="emoji-trigger btn-icon" onclick="toggleEmojiPicker('comment-{{ post.id }}')">
+                        <i class="far fa-smile"></i>
+                    </button>
+                </div>
+                <div id="commentEmojiPicker-{{ post.id }}" class="emoji-picker"></div>
                 <button type="submit" class="btn">
                     <i class="fas fa-reply"></i>
-                    Comment
+                    Yorum Yap
                 </button>
             </form>
         </div>
@@ -133,6 +145,9 @@
 <!-- Instagram Embed Script -->
 <script async src="https://www.instagram.com/embed.js"></script>
     </main>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner"></div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -328,22 +343,18 @@
             newPost.classList.add('post');
             newPost.id = `post-${data.post.id}`;
             newPost.innerHTML = `
-                <div class="post-header">
-                    <p class="post-content">${data.post.content}</p>
-                    <div class="post-footer">
-                        <div class="post-meta">
-                            <span class="timestamp">${data.post.timestamp}</span>
-                        </div>
-                        <div class="post-actions">
-                            <button class="action-btn post-like-btn" data-post-id="${data.post.id}">
-                                <i class="fas fa-heart"></i>
-                                <span class="post-like-count">0</span>
-                            </button>
-                            <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
-                                <i class="far fa-comment"></i>
-                                <span>0 comments</span>
-                            </button>
-                        </div>
+                <p class="post-content">${data.post.content}</p>
+                <div class="post-footer">
+                    <span class="timestamp">${data.post.timestamp}</span>
+                    <div class="post-actions">
+                        <button class="action-btn post-like-btn" data-post-id="${data.post.id}">
+                            <i class="fas fa-thumbs-up"></i>
+                            <span class="post-like-count">0</span>
+                        </button>
+                        <button class="action-btn" onclick="toggleComments('comments-${data.post.id}')">
+                            <i class="far fa-comment"></i>
+                            <span>0 comments</span>
+                        </button>
                     </div>
                 </div>
                 <div class="comments" id="comments-${data.post.id}">
@@ -360,15 +371,12 @@
             const postsContainer = document.getElementById('postsContainer');
             postsContainer.insertBefore(newPost, postsContainer.firstChild);
 
-            // Clear the Quill editor and hide the post form
             quill.root.innerHTML = '';
             postForm.classList.remove('visible');
 
-            // Attach comment form handler for the newly added post
             const newCommentForm = newPost.querySelector('.comment-form');
             attachCommentFormHandler(newCommentForm);
 
-            // Attach like button handler
             const newLikeButton = newPost.querySelector('.post-like-btn');
             newLikeButton.addEventListener('click', function() {
                 const postId = this.getAttribute('data-post-id');
@@ -563,7 +571,7 @@ function updateThemeToggleIcon(theme) {
                             <div class="comment-footer">
                                 <span class="timestamp" data-timestamp="${data.comment.timestamp}"></span>
                                 <button class="action-btn comment-like-btn" data-post-id="${postId}" data-comment-id="${data.comment.id}">
-                                    <i class="fas fa-heart"></i>
+                                    <i class="fas fa-thumbs-up"></i>
                                     <span class="comment-like-count">0</span>
                                 </button>
                             </div>
@@ -610,6 +618,73 @@ function updateThemeToggleIcon(theme) {
             this.style.height = this.scrollHeight + 'px';
         });
     });
+});
+
+// Emoji picker için yaygın emojiler
+const commonEmojis = ['👍', '❤️', '😊', '😂', '🎉', '👏', '🔥', '💯', '🤔', '😍', '💪', '✨', '🙌', '👌', '💖', '🎈'];
+
+function initializeEmojiPickers() {
+    const pickers = document.querySelectorAll('.emoji-picker');
+    pickers.forEach(picker => {
+        picker.innerHTML = commonEmojis.map(emoji => 
+            `<button type="button" class="emoji-btn" onclick="insertEmoji('${emoji}', this)">${emoji}</button>`
+        ).join('');
+    });
+}
+
+function toggleEmojiPicker(targetId) {
+    const picker = document.getElementById(targetId.includes('comment') ? 
+        `commentEmojiPicker-${targetId.split('-')[1]}` : 'postEmojiPicker');
+    picker.classList.toggle('visible');
+}
+
+function insertEmoji(emoji, button) {
+    const picker = button.closest('.emoji-picker');
+    const form = picker.closest('form');
+    const textarea = form.querySelector('textarea');
+    
+    if (textarea) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const text = textarea.value;
+        textarea.value = text.substring(0, start) + emoji + text.substring(end);
+        textarea.focus();
+        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+    } else {
+        // Quill editor için
+        const quill = Quill.find(document.querySelector('#quill-editor'));
+        const range = quill.getSelection(true);
+        quill.insertText(range.index, emoji);
+    }
+    
+    picker.classList.remove('visible');
+}
+
+// Loading durumları için fonksiyonlar
+function showLoading() {
+    document.getElementById('loadingSpinner').classList.add('visible');
+}
+
+function hideLoading() {
+    document.getElementById('loadingSpinner').classList.remove('visible');
+}
+
+// Form gönderimi sırasında loading gösterme
+document.getElementById('postForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    showLoading();
+    // ... mevcut form gönderme kodu ...
+    try {
+        // ... form işleme ...
+    } finally {
+        hideLoading();
+    }
+});
+
+// Sayfa yüklendiğinde emoji picker'ları başlat
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEmojiPickers();
+    // ... mevcut DOMContentLoaded işleyicileri ...
 });
 
     </script>

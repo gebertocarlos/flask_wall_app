@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import json
+import os
 
 app = Flask(__name__)
 
@@ -8,7 +9,6 @@ app = Flask(__name__)
 JSON_FILE = 'posts.json'
 
 # JSON dosyasından veri okuma işlevi
-# Bu işlev, JSON dosyasındaki gönderileri yükler, zaman damgalarını datetime nesnelerine dönüştürür ve eksik veya geçersiz dosyaları düzgün bir şekilde işler.
 def load_posts():
     try:
         with open(JSON_FILE, 'r') as file:
@@ -20,10 +20,12 @@ def load_posts():
                     comment['timestamp'] = datetime.fromisoformat(comment['timestamp'])
             return posts
     except (FileNotFoundError, json.JSONDecodeError):
+        # Dosya yoksa veya bozuksa boş liste döndür
+        with open(JSON_FILE, 'w') as file:
+            json.dump([], file)
         return []
 
 # JSON dosyasına veri kaydetme işlevi
-# Bu işlev, datetime nesnelerini string'e dönüştürerek JSON dosyasına yazar.
 def save_posts(posts):
     posts_to_save = []
     for post in posts:
@@ -157,4 +159,5 @@ def like_post(post_id):
 # Uygulamanın ana giriş noktası
 # Bu işlev, Flask uygulamasını geliştirme modunda çalıştırır.
 if __name__ == '__main__':
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
