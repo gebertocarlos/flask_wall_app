@@ -172,6 +172,10 @@
 
             // Post like işleme fonksiyonu
             function handlePostLike(url, button) {
+                // Beğeni animasyonunu başlat
+                const icon = button.querySelector('i');
+                icon.classList.add('like-animation');
+                
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -183,18 +187,52 @@
                     if (data.success) {
                         const likeCount = button.querySelector('.post-like-count');
                         likeCount.textContent = data.likes;
+                        
                         if (data.is_liked) {
                             button.classList.add('liked');
+                            // Pop-up animasyonu
+                            const popup = document.createElement('div');
+                            popup.className = 'like-popup';
+                            popup.innerHTML = '<i class="fas fa-thumbs-up"></i>';
+                            button.appendChild(popup);
+                            
+                            // GSAP animasyonu
+                            gsap.to(popup, {
+                                y: -50,
+                                x: Math.random() * 40 - 20, // Random X hareketi
+                                rotation: Math.random() * 30 - 15, // Random rotasyon
+                                opacity: 0,
+                                duration: 1,
+                                ease: "power2.out",
+                                onComplete: () => popup.remove()
+                            });
                         } else {
                             button.classList.remove('liked');
                         }
+                        
+                        // Beğeni sayısı değişim animasyonu
+                        gsap.from(likeCount, {
+                            scale: 1.5,
+                            duration: 0.3,
+                            ease: "elastic.out(1, 0.3)"
+                        });
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error:', error))
+                .finally(() => {
+                    // Animasyonu temizle
+                    setTimeout(() => {
+                        icon.classList.remove('like-animation');
+                    }, 1000);
+                });
             }
 
             // Yorum like işleme fonksiyonu
             function handleCommentLike(url, button) {
+                // Beğeni animasyonunu başlat
+                const icon = button.querySelector('i');
+                icon.classList.add('like-animation');
+                
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -206,14 +244,44 @@
                     if (data.success) {
                         const likeCount = button.querySelector('.comment-like-count');
                         likeCount.textContent = data.likes;
+                        
                         if (data.is_liked) {
                             button.classList.add('liked');
+                            // Pop-up animasyonu
+                            const popup = document.createElement('div');
+                            popup.className = 'like-popup';
+                            popup.innerHTML = '<i class="fas fa-thumbs-up"></i>';
+                            button.appendChild(popup);
+                            
+                            // GSAP animasyonu
+                            gsap.to(popup, {
+                                y: -30,
+                                x: Math.random() * 30 - 15, // Random X hareketi
+                                rotation: Math.random() * 20 - 10, // Random rotasyon
+                                opacity: 0,
+                                duration: 1,
+                                ease: "power2.out",
+                                onComplete: () => popup.remove()
+                            });
                         } else {
                             button.classList.remove('liked');
                         }
+                        
+                        // Beğeni sayısı değişim animasyonu
+                        gsap.from(likeCount, {
+                            scale: 1.5,
+                            duration: 0.3,
+                            ease: "elastic.out(1, 0.3)"
+                        });
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.error('Error:', error))
+                .finally(() => {
+                    // Animasyonu temizle
+                    setTimeout(() => {
+                        icon.classList.remove('like-animation');
+                    }, 1000);
+                });
             }
 
             // Yeni yorum eklendiğinde like işleyicisini ekle

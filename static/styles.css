@@ -824,3 +824,110 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Like Animations */
+.like-animation {
+    animation: likeClick 1s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+}
+
+@keyframes likeClick {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.5) rotate(10deg);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.like-popup {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1000;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--primary);
+}
+
+.like-popup i {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Post ve yorum beğeni butonları için pozisyon ayarları */
+.post-like-btn, .comment-like-btn {
+    position: relative;
+    overflow: visible;
+}
+
+/* Beğeni sayacı animasyonu */
+.post-like-count, .comment-like-count {
+    display: inline-block;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-left: 4px;
+}
+
+.post-like-btn.liked i, .comment-like-btn.liked i {
+    color: var(--primary);
+    animation: thumbsUpBeat 0.3s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+}
+
+@keyframes thumbsUpBeat {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.4) rotate(20deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+.like-animation {
+    animation: thumbsUpClick 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+}
+
+@keyframes thumbsUpClick {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.5) rotate(20deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}
+
+/* Hover efektleri */
+.post-like-btn:hover i, .comment-like-btn:hover i {
+    transform: scale(1.2) rotate(10deg);
+    transition: transform 0.2s cubic-bezier(0.17, 0.89, 0.32, 1.49);
+}
+
+/* Active state animasyonu */
+.post-like-btn:active i, .comment-like-btn:active i {
+    transform: scale(0.8) rotate(-10deg);
+    transition: transform 0.1s ease;
+}
+
+/* Beğeni butonları için özel efektler */
+.post-like-btn.liked:hover i, .comment-like-btn.liked:hover i {
+    animation: thumbsUpPulse 1s infinite;
+}
+
+@keyframes thumbsUpPulse {
+    0% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(10deg);
+    }
+    100% {
+        transform: scale(1) rotate(0deg);
+    }
+}

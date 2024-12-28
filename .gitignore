@@ -4,9 +4,27 @@ __pycache__/
 *$py.class
 *.so
 .Python
-myenv_311/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
 venv/
 ENV/
+env/
+.env
 
 # IDE
 .idea/
@@ -18,7 +36,6 @@ ENV/
 .DS_Store
 Thumbs.db
 
-# Application specific
-instance/
+# Project specific
 *.log
-.env 
+posts.json 
