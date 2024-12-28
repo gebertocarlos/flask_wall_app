@@ -3,7 +3,17 @@ services:
     name: flask-wall-app
     env: python
     region: frankfurt
-    buildCommand: sh build.sh
+    buildCommand: |
+      python --version
+      pip --version
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      mkdir -p static instance templates
+      touch posts.json
+      echo "[]" > posts.json
+      chmod -R 755 .
+      chmod 666 posts.json
+      ls -la
     startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 4
     envVars:
       - key: PYTHON_VERSION
