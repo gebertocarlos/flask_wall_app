@@ -2,27 +2,11 @@ services:
   - type: web
     name: flask-wall-app
     env: python
-    region: frankfurt
-    buildCommand: |
-      python --version
-      pip --version
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      mkdir -p static instance templates
-      touch posts.json
-      echo "[]" > posts.json
-      chmod -R 755 .
-      chmod 666 posts.json
-      ls -la
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT --workers 4
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.7
-      - key: FLASK_APP
-        value: app.py
       - key: FLASK_ENV
-        value: production
-      - key: PORT
-        value: 10000
-    healthCheckPath: /
-    autoDeploy: true 
+        value: production 

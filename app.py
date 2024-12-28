@@ -11,16 +11,26 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # JSON dosyasının yolu
-JSON_FILE = os.path.join(os.getcwd(), 'posts.json')
+JSON_FILE = 'posts.json'
+
+# Başlangıç verisi
+INITIAL_POST = {
+    "id": 1,
+    "content": "<h1 class=\"ql-align-center\"><strong>WELCOME TO THE WALL</strong></h1><p><br></p><p>This app is a community wall platform where users can share their thoughts, ideas, and updates in real time.</p>",
+    "timestamp": datetime.now().isoformat(),
+    "comments": [],
+    "likes": 0,
+    "liked_by": []
+}
 
 # JSON dosyasından veri okuma işlevi
 def load_posts():
     try:
         if not os.path.exists(JSON_FILE):
-            logger.info(f"Creating new posts.json file at {JSON_FILE}")
-            with open(JSON_FILE, 'w') as f:
-                json.dump([], f)
-            return []
+            # Dosya yoksa başlangıç verisiyle oluştur
+            with open(JSON_FILE, 'w') as file:
+                json.dump([INITIAL_POST], file, indent=4)
+            return [INITIAL_POST]
 
         with open(JSON_FILE, 'r') as file:
             posts = json.load(file)
@@ -31,8 +41,8 @@ def load_posts():
                     comment['timestamp'] = datetime.fromisoformat(comment['timestamp'])
             return posts
     except Exception as e:
-        logger.error(f"Error loading posts: {str(e)}")
-        return []
+        print(f"Error loading posts: {str(e)}")
+        return [INITIAL_POST]
 
 # JSON dosyasına veri kaydetme işlevi
 def save_posts(posts):
