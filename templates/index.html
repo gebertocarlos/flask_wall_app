@@ -68,15 +68,11 @@
                     <input type="hidden" name="content" id="quillHiddenContent">
                     <div id="quill-editor"></div>
                     <div class="form-actions">
-                        <button type="button" class="emoji-trigger btn-icon" onclick="toggleEmojiPicker('post')">
-                            <i class="far fa-smile"></i>
-                        </button>
                         <button type="submit" class="btn">
                             <i class="fas fa-paper-plane"></i>
                             Share
                         </button>
                     </div>
-                    <div id="postEmojiPicker" class="emoji-picker"></div>
                 </form>
             </div>
         </div>
@@ -125,13 +121,7 @@
             </div>
             {% endfor %}
             <form class="comment-form" data-post-id="{{ post.id }}">
-                <div class="comment-input-wrapper">
-                    <textarea name="content" placeholder="Write a comment..." required></textarea>
-                    <button type="button" class="emoji-trigger btn-icon" onclick="toggleEmojiPicker('comment-{{ post.id }}')">
-                        <i class="far fa-smile"></i>
-                    </button>
-                </div>
-                <div id="commentEmojiPicker-{{ post.id }}" class="emoji-picker"></div>
+                <textarea name="content" placeholder="Write a comment..." required></textarea>
                 <button type="submit" class="btn">
                     <i class="fas fa-reply"></i>
                     Comment
@@ -688,46 +678,6 @@ function updateThemeToggleIcon(theme) {
     });
 });
 
-// Emoji picker için yaygın emojiler
-const commonEmojis = ['👍', '❤️', '😊', '😂', '🎉', '👏', '🔥', '💯', '🤔', '😍', '💪', '✨', '🙌', '👌', '💖', '🎈'];
-
-function initializeEmojiPickers() {
-    const pickers = document.querySelectorAll('.emoji-picker');
-    pickers.forEach(picker => {
-        picker.innerHTML = commonEmojis.map(emoji => 
-            `<button type="button" class="emoji-btn" onclick="insertEmoji('${emoji}', this)">${emoji}</button>`
-        ).join('');
-    });
-}
-
-function toggleEmojiPicker(targetId) {
-    const picker = document.getElementById(targetId.includes('comment') ? 
-        `commentEmojiPicker-${targetId.split('-')[1]}` : 'postEmojiPicker');
-    picker.classList.toggle('visible');
-}
-
-function insertEmoji(emoji, button) {
-    const picker = button.closest('.emoji-picker');
-    const form = picker.closest('form');
-    const textarea = form.querySelector('textarea');
-    
-    if (textarea) {
-        const start = textarea.selectionStart;
-        const end = textarea.selectionEnd;
-        const text = textarea.value;
-        textarea.value = text.substring(0, start) + emoji + text.substring(end);
-        textarea.focus();
-        textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
-    } else {
-        // Quill editor için
-        const quill = Quill.find(document.querySelector('#quill-editor'));
-        const range = quill.getSelection(true);
-        quill.insertText(range.index, emoji);
-    }
-    
-    picker.classList.remove('visible');
-}
-
 // Loading durumları için fonksiyonlar
 function showLoading() {
     document.getElementById('loadingSpinner').classList.add('visible');
@@ -747,12 +697,6 @@ document.getElementById('postForm').addEventListener('submit', async (event) => 
     } finally {
         hideLoading();
     }
-});
-
-// Sayfa yüklendiğinde emoji picker'ları başlat
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEmojiPickers();
-    // ... mevcut DOMContentLoaded işleyicileri ...
 });
 
     </script>

@@ -768,42 +768,6 @@ body {
     animation: slideIn 0.3s ease-out;
 }
 
-/* Emoji picker için stil */
-.emoji-picker {
-    position: absolute;
-    bottom: 100%;
-    right: 0;
-    z-index: 1000;
-    background: var(--surface-alt);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    box-shadow: var(--shadow-md);
-    padding: 8px;
-    display: none;
-}
-
-.emoji-picker.visible {
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 4px;
-    animation: slideIn 0.2s ease-out;
-}
-
-.emoji-btn {
-    background: none;
-    border: none;
-    padding: 4px;
-    cursor: pointer;
-    font-size: 1.2rem;
-    border-radius: 4px;
-    transition: all 0.2s ease;
-}
-
-.emoji-btn:hover {
-    background: var(--surface-hover);
-    transform: scale(1.1);
-}
-
 /* Loading spinner */
 .loading-spinner {
     width: 40px;
