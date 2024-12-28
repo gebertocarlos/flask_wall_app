@@ -39,7 +39,6 @@
                     .catch((err) => console.error('Service Worker Registration Failed:', err));
             }
         </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     </head>
         
 <body>
@@ -173,13 +172,6 @@
 
             // Post like işleme fonksiyonu
             function handlePostLike(url, button) {
-                const icon = button.querySelector('i');
-                const likeCount = button.querySelector('.post-like-count');
-                
-                // Animasyon sınıflarını temizle
-                button.classList.remove('animating');
-                likeCount.classList.remove('count-update');
-                
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -189,43 +181,20 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Like sayısını güncelle
+                        const likeCount = button.querySelector('.post-like-count');
                         likeCount.textContent = data.likes;
-                        likeCount.classList.add('count-update');
-                        
-                        // Like/unlike durumuna göre animasyon
-                        button.classList.add('animating');
                         if (data.is_liked) {
                             button.classList.add('liked');
-                            icon.style.animation = 'none';
-                            void icon.offsetWidth; // Reflow
-                            icon.style.animation = 'likeAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                         } else {
                             button.classList.remove('liked');
-                            icon.style.animation = 'none';
-                            void icon.offsetWidth; // Reflow
-                            icon.style.animation = 'unlikeAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                         }
-                        
-                        // Animasyon temizleme
-                        setTimeout(() => {
-                            button.classList.remove('animating');
-                            likeCount.classList.remove('count-update');
-                        }, 500);
                     }
                 })
                 .catch(error => console.error('Error:', error));
             }
 
-            // Yorum like işleyicisi
+            // Yorum like işleme fonksiyonu
             function handleCommentLike(url, button) {
-                const icon = button.querySelector('i');
-                const likeCount = button.querySelector('.comment-like-count');
-                
-                // Animasyon sınıflarını temizle
-                button.classList.remove('animating');
-                likeCount.classList.remove('count-update');
-                
                 fetch(url, {
                     method: 'POST',
                     headers: {
@@ -235,29 +204,13 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Like sayısını güncelle
+                        const likeCount = button.querySelector('.comment-like-count');
                         likeCount.textContent = data.likes;
-                        likeCount.classList.add('count-update');
-                        
-                        // Like/unlike durumuna göre animasyon
-                        button.classList.add('animating');
                         if (data.is_liked) {
                             button.classList.add('liked');
-                            icon.style.animation = 'none';
-                            void icon.offsetWidth; // Reflow
-                            icon.style.animation = 'likeAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                         } else {
                             button.classList.remove('liked');
-                            icon.style.animation = 'none';
-                            void icon.offsetWidth; // Reflow
-                            icon.style.animation = 'unlikeAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
                         }
-                        
-                        // Animasyon temizleme
-                        setTimeout(() => {
-                            button.classList.remove('animating');
-                            likeCount.classList.remove('count-update');
-                        }, 500);
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -732,30 +685,6 @@ document.getElementById('postForm').addEventListener('submit', async (event) => 
 document.addEventListener('DOMContentLoaded', () => {
     initializeEmojiPickers();
     // ... mevcut DOMContentLoaded işleyicileri ...
-});
-
-// WebSocket bağlantısı
-const socket = io();
-
-// Beğeni güncellemelerini dinle
-socket.on('like_update', function(data) {
-    if (data.type === 'post') {
-        // Post beğeni güncellemesi
-        const likeCount = document.querySelector(`#post-${data.post_id} .post-like-count`);
-        if (likeCount) {
-            likeCount.textContent = data.likes;
-            likeCount.classList.add('count-update');
-            setTimeout(() => likeCount.classList.remove('count-update'), 500);
-        }
-    } else if (data.type === 'comment') {
-        // Yorum beğeni güncellemesi
-        const likeCount = document.querySelector(`#comment-${data.post_id}-${data.comment_id} .comment-like-count`);
-        if (likeCount) {
-            likeCount.textContent = data.likes;
-            likeCount.classList.add('count-update');
-            setTimeout(() => likeCount.classList.remove('count-update'), 500);
-        }
-    }
 });
 
     </script>

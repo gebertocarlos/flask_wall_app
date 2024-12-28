@@ -1,10 +1,74 @@
 [
     {
         "id": 1,
-        "content": "<h1 class=\"ql-align-center\"><strong>WELCOME TO THE WALL</strong></h1><p><br></p><p>This app is a community wall platform where users can share their thoughts, ideas, and updates in real time. The app allows users to post messages on a public wall, view posts from others, and engage through comments.</p><p><br></p><p><strong class=\"ql-size-large\"><u>Key Features:</u></strong></p><p><strong>• Post Creation:</strong> Users can write and publish posts to share with the community.</p><p><strong>• Real-Time Comments:</strong> Other users can add comments to any post, fostering discussions and interactions.</p><p><strong>• Organized Timeline:</strong> Posts are displayed chronologically, showing when they were created.</p><p><strong>• Dark Theme:</strong> A sleek and modern dark interface ensures a visually appealing experience for users.</p><p><strong>• User-Friendly Design:</strong> The app is intuitive and easy to navigate, making it accessible to users of all levels.</p>",
-        "timestamp": "2024-12-28T21:00:00.000000",
-        "comments": [],
-        "likes": 0,
-        "liked_by": []
+        "content": "<h1 class=\"ql-align-center\"><strong>WELCOME TO THE WALL</strong></h1><p><br></p><p>\tThis app is a community wall platform where users can share their thoughts, ideas, and updates in real time. The app allows users to post messages on a public wall, view posts from others, and engage through comments. Each post and comment displays relevant information, such as the content and timestamp, ensuring an organized and interactive experience. </p><p><br></p><p><strong class=\"ql-size-large\"><u>Key Features: </u></strong></p><p><strong>\u2022 Post Creation: </strong>Users can write and publish posts to share with the community. </p><p><strong>\u2022 Real-Time Comments:</strong> Other users can add comments to any post, fostering discussions and interactions. </p><p><strong>\u2022 Organized Timeline:</strong> Posts are displayed chronologically, showing when they were created. </p><p><strong>\u2022 Dark Theme: </strong>A sleek and modern dark interface ensures a visually appealing experience for users. </p><p><strong>\u2022 User-Friendly Design: </strong>The app is intuitive and easy to navigate, making it accessible to users of all levels. </p><p><br></p><p>\tThis app is ideal for communities, discussion groups, or anyone looking for a shared digital space to communicate and connect.</p>",
+        "timestamp": "2024-12-24 17:43:47.243534",
+        "comments": [
+            {
+                "id": 1,
+                "content": "very good ",
+                "timestamp": "2024-12-25 02:08:12.759005",
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ],
+                "is_liked": false
+            }
+        ],
+        "liked_by": [
+            "127.0.0.1"
+        ],
+        "likes": 1,
+        "is_liked": true
+    },
+    {
+        "id": 2,
+        "content": "<iframe class=\"ql-video\" frameborder=\"0\" allowfullscreen=\"true\" src=\"https://www.youtube.com/embed/w0QDAg85Oow?si=wzYUOWVtuoLqODCz\"></iframe><p><br></p>",
+        "timestamp": "2024-12-24 19:46:18.770622",
+        "comments": [
+            {
+                "id": 1,
+                "content": "good content",
+                "timestamp": "2024-12-24 20:34:51.408864",
+                "likes": 2,
+                "liked_by": [
+                    "127.0.0.1",
+                    "192.168.1.37"
+                ],
+                "is_liked": true
+            },
+            {
+                "id": 2,
+                "content": "thank you",
+                "timestamp": "2024-12-25 02:25:16.587009",
+                "likes": 1,
+                "liked_by": [
+                    "127.0.0.1"
+                ],
+                "is_liked": false
+            },
+            {
+                "id": 3,
+                "content": "\ud83d\udc4d",
+                "timestamp": "2024-12-25 03:27:32.819058",
+                "likes": 0,
+                "liked_by": [],
+                "is_liked": false
+            },
+            {
+                "id": 4,
+                "content": "great ",
+                "timestamp": "2024-12-26 03:05:27.086682",
+                "likes": 0,
+                "liked_by": [],
+                "is_liked": false
+            }
+        ],
+        "liked_by": [
+            "127.0.0.1",
+            "192.168.1.37"
+        ],
+        "likes": 2,
+        "is_liked": true
     }
 ]
