@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify, make_response
+from flask_socketio import SocketIO, emit
 from datetime import datetime
 import json
 import os
@@ -6,6 +7,7 @@ import uuid
 import logging
 
 app = Flask(__name__)
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 # Logging yapılandırması
 logging.basicConfig(level=logging.INFO)
@@ -171,14 +173,21 @@ def like_comment(post_id, comment_id):
                 is_liked = True
                 
             save_posts(posts)
+            
+            # WebSocket ile tüm kullanıcılara bildir
+            socketio.emit('like_update', {
+                'post_id': post_id,
+                'comment_id': comment_id,
+                'likes': comment['likes'],
+                'type': 'comment'
+            })
+            
             response = jsonify({
                 'success': True, 
                 'likes': comment['likes'], 
                 'is_liked': is_liked
             })
-            
-            # Cookie'yi ayarla
-            response.set_cookie('user_id', user_id, max_age=31536000)  # 1 yıl
+            response.set_cookie('user_id', user_id, max_age=31536000)
             return response
                 
     return jsonify({'success': False, 'message': 'Comment not found'}), 404
@@ -206,14 +215,20 @@ def like_post(post_id):
             is_liked = True
             
         save_posts(posts)
+        
+        # WebSocket ile tüm kullanıcılara bildir
+        socketio.emit('like_update', {
+            'post_id': post_id,
+            'likes': post['likes'],
+            'type': 'post'
+        })
+        
         response = jsonify({
             'success': True, 
             'likes': post['likes'], 
             'is_liked': is_liked
         })
-        
-        # Cookie'yi ayarla
-        response.set_cookie('user_id', user_id, max_age=31536000)  # 1 yıl
+        response.set_cookie('user_id', user_id, max_age=31536000)
         return response
     
     return jsonify({'success': False, 'message': 'Post not found'}), 404
@@ -222,4 +237,4 @@ def like_post(post_id):
 # Bu işlev, Flask uygulamasını geliştirme modunda çalıştırır.
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 8080))
-    app.run(host='0.0.0.0', port=port)
+    socketio.run(app, host='0.0.0.0', port=port)

@@ -824,3 +824,114 @@ body {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* Beğeni Animasyonları */
+@keyframes likeAnimation {
+    0% { transform: scale(1); }
+    25% { transform: scale(1.2) rotate(-15deg); }
+    50% { transform: scale(0.95) rotate(15deg); }
+    75% { transform: scale(1.1) rotate(-10deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+@keyframes unlikeAnimation {
+    0% { transform: scale(1) rotate(0); }
+    25% { transform: scale(0.9) rotate(5deg); }
+    50% { transform: scale(1.1) rotate(-5deg); }
+    100% { transform: scale(1) rotate(0); }
+}
+
+.post-like-btn, .comment-like-btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.post-like-btn i, .comment-like-btn i {
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.post-like-btn.liked i {
+    color: #ff4b4b;
+    animation: likeAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.post-like-btn:not(.liked) i {
+    animation: unlikeAnimation 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.post-like-btn::before, .comment-like-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: radial-gradient(circle, #ff4b4b 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.post-like-btn:active::before, .comment-like-btn:active::before {
+    width: 150%;
+    height: 150%;
+    opacity: 0.2;
+}
+
+.post-like-btn.liked::after, .comment-like-btn.liked::after {
+    content: '❤️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    opacity: 0;
+    animation: floatHeart 1s ease-out forwards;
+}
+
+@keyframes floatHeart {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 0.5;
+    }
+    100% {
+        transform: translate(-50%, -200%) scale(1.5);
+        opacity: 0;
+    }
+}
+
+.post-like-count, .comment-like-count {
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.post-like-btn.liked .post-like-count,
+.comment-like-btn.liked .comment-like-count {
+    transform: scale(1.1);
+    color: #ff4b4b;
+}
+
+/* Hover Efektleri */
+.post-like-btn:hover i, .comment-like-btn:hover i {
+    transform: scale(1.1);
+}
+
+.post-like-btn:hover:not(.liked) i {
+    color: #ff4b4b;
+    opacity: 0.7;
+}
+
+/* Like Sayacı Animasyonu */
+@keyframes countPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.count-update {
+    animation: countPop 0.3s ease-out;
+}
