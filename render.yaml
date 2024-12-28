@@ -2,10 +2,15 @@ services:
   - type: web
     name: flask-wall-app
     env: python
-    buildCommand: "./build.sh"
-    startCommand: "gunicorn app:app"
+    region: frankfurt
+    buildCommand: chmod +x build.sh && ./build.sh
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.11.7
+      - key: FLASK_APP
+        value: app.py
+      - key: FLASK_ENV
+        value: production
     healthCheckPath: /
     autoDeploy: true 

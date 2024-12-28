@@ -1,17 +1,24 @@
-#!/bin/bash
-# exit on error
+#!/usr/bin/env bash
 set -o errexit
 
-# Python sürümünü kontrol et ve kur
-python3 -m pip install --upgrade pip
-
-# Bağımlılıkları yükle
+echo "Installing dependencies..."
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 
-# JSON dosyasını oluştur (eğer yoksa)
+echo "Creating necessary directories..."
+mkdir -p static
+mkdir -p instance
+
+echo "Initializing data files..."
 if [ ! -f posts.json ]; then
+    echo "Creating posts.json..."
     echo "[]" > posts.json
+    chmod 666 posts.json
 fi
 
-# static klasörünü oluştur (eğer yoksa)
-mkdir -p static 
+echo "Setting file permissions..."
+chmod -R 755 static
+chmod -R 755 templates
+chmod 755 app.py
+
+echo "Build completed successfully!" 

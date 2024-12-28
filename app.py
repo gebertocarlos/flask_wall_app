@@ -2,15 +2,26 @@ from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import json
 import os
+import logging
 
 app = Flask(__name__)
 
+# Logging yapılandırması
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # JSON dosyasının yolu
-JSON_FILE = 'posts.json'
+JSON_FILE = os.path.join(os.getcwd(), 'posts.json')
 
 # JSON dosyasından veri okuma işlevi
 def load_posts():
     try:
+        if not os.path.exists(JSON_FILE):
+            logger.info(f"Creating new posts.json file at {JSON_FILE}")
+            with open(JSON_FILE, 'w') as f:
+                json.dump([], f)
+            return []
+
         with open(JSON_FILE, 'r') as file:
             posts = json.load(file)
             # Zaman damgalarını datetime nesnelerine dönüştürme
@@ -19,24 +30,26 @@ def load_posts():
                 for comment in post['comments']:
                     comment['timestamp'] = datetime.fromisoformat(comment['timestamp'])
             return posts
-    except (FileNotFoundError, json.JSONDecodeError):
-        # Dosya yoksa veya bozuksa boş liste döndür
-        with open(JSON_FILE, 'w') as file:
-            json.dump([], file)
+    except Exception as e:
+        logger.error(f"Error loading posts: {str(e)}")
         return []
 
 # JSON dosyasına veri kaydetme işlevi
 def save_posts(posts):
-    posts_to_save = []
-    for post in posts:
-        post_copy = post.copy()
-        post_copy['timestamp'] = str(post_copy['timestamp'])
-        post_copy['comments'] = [{**comment, 'timestamp': str(comment['timestamp'])} 
-                               for comment in post_copy['comments']]
-        posts_to_save.append(post_copy)
-    
-    with open(JSON_FILE, 'w') as file:
-        json.dump(posts_to_save, file, indent=4)
+    try:
+        posts_to_save = []
+        for post in posts:
+            post_copy = post.copy()
+            post_copy['timestamp'] = str(post_copy['timestamp'])
+            post_copy['comments'] = [{**comment, 'timestamp': str(comment['timestamp'])} 
+                                   for comment in post_copy['comments']]
+            posts_to_save.append(post_copy)
+        
+        with open(JSON_FILE, 'w') as file:
+            json.dump(posts_to_save, file, indent=4)
+    except Exception as e:
+        logger.error(f"Error saving posts: {str(e)}")
+        raise
 
 # Ana sayfa rotası
 # Bu işlev gönderileri yükler, zaman damgalarına göre sıralar ve gönderilerle birlikte ana sayfayı render eder.
