@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-        <meta name="description" content="Wall App: Modern bir duvar uygulaması, içerik paylaşımı ve yorumlama.">
+        <meta name="description" content="Wall App: A modern community wall application for sharing and interacting.">
         <meta name="theme-color" content="#1e1e1e"> <!-- Tarayıcı teması rengi -->
         <title>Wall App</title>
     
@@ -61,7 +61,7 @@
         <div class="post-form-container">
             <button class="toggle-post-form">
                 <i class="fas fa-plus"></i>
-                Post Something
+                Create Post
             </button>
             <div class="post-form">
                 <form id="postForm">
@@ -73,7 +73,7 @@
                         </button>
                         <button type="submit" class="btn">
                             <i class="fas fa-paper-plane"></i>
-                            Paylaş
+                            Share
                         </button>
                     </div>
                     <div id="postEmojiPicker" class="emoji-picker"></div>
@@ -126,7 +126,7 @@
             {% endfor %}
             <form class="comment-form" data-post-id="{{ post.id }}">
                 <div class="comment-input-wrapper">
-                    <textarea name="content" placeholder="Bir yorum yazın..." required></textarea>
+                    <textarea name="content" placeholder="Write a comment..." required></textarea>
                     <button type="button" class="emoji-trigger btn-icon" onclick="toggleEmojiPicker('comment-{{ post.id }}')">
                         <i class="far fa-smile"></i>
                     </button>
@@ -134,7 +134,7 @@
                 <div id="commentEmojiPicker-{{ post.id }}" class="emoji-picker"></div>
                 <button type="submit" class="btn">
                     <i class="fas fa-reply"></i>
-                    Yorum Yap
+                    Comment
                 </button>
             </form>
         </div>
@@ -378,7 +378,7 @@
             // Initialize Quill Editor
             const quill = new Quill('#quill-editor', {
                 theme: 'snow',
-                placeholder: 'Write something on the wall...',
+                placeholder: 'Share your thoughts...',
                 modules: {
                     toolbar: [
                         ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
@@ -594,7 +594,7 @@ function updateThemeToggleIcon(theme) {
             const isVisible = postForm.classList.contains('visible');
             togglePostForm.innerHTML = isVisible ? 
                 '<i class="fas fa-times"></i> Close' : 
-                '<i class="fas fa-plus"></i> Post Something';
+                '<i class="fas fa-plus"></i> Create Post';
         });
 
         // Comment Toggle

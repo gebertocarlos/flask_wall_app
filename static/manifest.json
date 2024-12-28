@@ -1,2 +1,21 @@
 {
+    "name": "Wall App",
+    "short_name": "WallApp",
+    "description": "A modern community wall application for sharing thoughts and updates",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#4338ca",
+    "icons": [
+        {
+            "src": "/static/favicon-16x16.png",
+            "sizes": "16x16",
+            "type": "image/png"
+        },
+        {
+            "src": "/static/favicon-32x32.png",
+            "sizes": "32x32",
+            "type": "image/png"
+        }
+    ]
 }

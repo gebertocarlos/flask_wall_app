@@ -84,18 +84,18 @@ def create_post():
             'timestamp': datetime.now(),
             'comments': [],
             'likes': 0,
-            'liked_by': []  # IP adreslerini saklamak için
+            'liked_by': []  # IP addresses for tracking likes
         }
         posts.append(new_post)
         save_posts(posts)
         
         response_post = {
             **new_post,
-            'timestamp': new_post['timestamp'].strftime('%B %d, %Y at %H:%M')  # 24 saat formatı
+            'timestamp': new_post['timestamp'].strftime('%B %d, %Y at %H:%M')  # 24-hour format
         }
         return jsonify({'success': True, 'post': response_post})
     
-    return jsonify({'success': False, 'message': 'İçerik sağlanmadı'}), 400
+    return jsonify({'success': False, 'message': 'Content not provided'}), 400
 
 # Belirli bir gönderiye yorum ekleme rotası
 # Bu işlev, bir gönderiye yorum eklemek için POST isteğini işler, giriş verisini doğrular ve doğru gönderiye yorumu ekler.
