@@ -931,3 +931,225 @@ body {
         transform: scale(1) rotate(0deg);
     }
 }
+
+/* Mobil Uyumluluk için Media Queries */
+@media (max-width: 768px) {
+    /* Genel düzen */
+    .container {
+        padding: 0.5rem;
+        margin: 0;
+        width: 100%;
+    }
+
+    /* Navbar */
+    .navbar {
+        padding: 0.75rem;
+    }
+
+    .navbar-content {
+        padding: 0 0.5rem;
+    }
+
+    .brand {
+        font-size: 1.25rem;
+    }
+
+    .brand i {
+        font-size: 1.1rem;
+    }
+
+    /* Post form */
+    .post-form-container {
+        padding: 0.5rem;
+    }
+
+    .toggle-post-form {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+
+    /* Quill editor */
+    .ql-toolbar {
+        padding: 0.5rem !important;
+        flex-wrap: wrap;
+    }
+
+    .ql-toolbar button {
+        padding: 2px !important;
+    }
+
+    .ql-editor {
+        padding: 0.75rem !important;
+        min-height: 100px;
+        font-size: 0.9rem !important;
+    }
+
+    /* Posts */
+    .post {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .post-content {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+    .post-content h1 {
+        font-size: 1.5rem !important;
+    }
+
+    .post-content h2 {
+        font-size: 1.3rem !important;
+    }
+
+    .post-content h3 {
+        font-size: 1.1rem !important;
+    }
+
+    /* Post footer ve beğeni butonları */
+    .post-footer {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .post-actions {
+        gap: 0.5rem;
+    }
+
+    .action-btn {
+        padding: 0.25rem;
+        font-size: 0.8rem;
+    }
+
+    .post-like-btn i, .comment-like-btn i {
+        font-size: 0.9rem;
+    }
+
+    .post-like-count, .comment-like-count {
+        font-size: 0.8rem;
+    }
+
+    /* Yorumlar */
+    .comments {
+        margin-top: 1rem;
+        padding-top: 1rem;
+    }
+
+    .comment {
+        padding: 0.75rem;
+        margin-bottom: 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .comment-footer {
+        font-size: 0.75rem;
+    }
+
+    .comment-form textarea {
+        padding: 0.5rem;
+        min-height: 60px;
+        font-size: 0.85rem;
+    }
+
+    /* Emoji picker */
+    .emoji-picker.visible {
+        grid-template-columns: repeat(6, 1fr);
+    }
+
+    .emoji-btn {
+        font-size: 1rem;
+        padding: 3px;
+    }
+
+    /* Timestamp */
+    .timestamp {
+        font-size: 0.75rem;
+    }
+
+    /* Butonlar */
+    .btn {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+    }
+
+    .btn i {
+        font-size: 0.85rem;
+    }
+
+    /* Like popup */
+    .like-popup i {
+        font-size: 1.2rem;
+    }
+}
+
+/* iPhone SE gibi küçük ekranlar için ek düzenlemeler */
+@media (max-width: 375px) {
+    .brand {
+        font-size: 1.1rem;
+    }
+
+    .post {
+        padding: 0.75rem;
+    }
+
+    .post-content {
+        font-size: 0.85rem;
+    }
+
+    .post-content h1 {
+        font-size: 1.3rem !important;
+    }
+
+    .post-content h2 {
+        font-size: 1.1rem !important;
+    }
+
+    .post-content h3 {
+        font-size: 1rem !important;
+    }
+
+    .emoji-picker.visible {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .action-btn {
+        padding: 0.2rem;
+        font-size: 0.75rem;
+    }
+}
+
+/* iPhone 12 Pro Max gibi büyük ekranlar için optimizasyonlar */
+@media (min-width: 428px) and (max-width: 926px) {
+    .container {
+        max-width: 95%;
+    }
+
+    .post {
+        padding: 1.25rem;
+    }
+
+    .post-content {
+        font-size: 1rem;
+    }
+}
+
+/* Yatay mod için düzenlemeler */
+@media (max-height: 428px) and (orientation: landscape) {
+    .container {
+        height: calc(100vh - 56px);
+    }
+
+    .navbar {
+        padding: 0.5rem;
+    }
+
+    .post {
+        margin-bottom: 0.75rem;
+    }
+
+    .ql-editor {
+        min-height: 80px;
+    }
+}
