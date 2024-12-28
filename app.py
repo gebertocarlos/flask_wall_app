@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, make_response
 from datetime import datetime
 import json
 import os
+import uuid
 import logging
 
 app = Flask(__name__)
@@ -61,13 +62,31 @@ def save_posts(posts):
         logger.error(f"Error saving posts: {str(e)}")
         raise
 
+def get_or_create_user_id():
+    user_id = request.cookies.get('user_id')
+    if not user_id:
+        user_id = str(uuid.uuid4())
+    return user_id
+
 # Ana sayfa rotası
 # Bu işlev gönderileri yükler, zaman damgalarına göre sıralar ve gönderilerle birlikte ana sayfayı render eder.
 @app.route('/')
 def home():
     posts = load_posts()
+    user_id = get_or_create_user_id()
+    
+    # Her post için beğeni durumunu kontrol et
+    for post in posts:
+        post['is_liked'] = user_id in post.get('liked_by', [])
+        for comment in post.get('comments', []):
+            comment['is_liked'] = user_id in comment.get('liked_by', [])
+    
     sorted_posts = sorted(posts, key=lambda post: post['timestamp'], reverse=True)
-    return render_template('index.html', posts=sorted_posts)
+    response = make_response(render_template('index.html', posts=sorted_posts))
+    
+    # Cookie'yi ayarla
+    response.set_cookie('user_id', user_id, max_age=31536000)  # 1 yıl
+    return response
 
 # Yeni gönderi oluşturma rotası
 # Bu işlev, yeni bir gönderi oluşturmak için POST isteğini işler. Giriş verisini doğrular, gönderiyi listeye ekler ve JSON dosyasına kaydeder.
@@ -130,7 +149,7 @@ def add_comment(post_id):
 # Belirli bir yoruma like ekleme/kaldırma rotası
 @app.route('/like_comment/<int:post_id>/<int:comment_id>', methods=['POST'])
 def like_comment(post_id, comment_id):
-    user_ip = request.remote_addr
+    user_id = get_or_create_user_id()
     posts = load_posts()
     post = next((p for p in posts if p['id'] == post_id), None)
     
@@ -142,22 +161,32 @@ def like_comment(post_id, comment_id):
             if 'likes' not in comment:
                 comment['likes'] = 0
                 
-            if user_ip in comment['liked_by']:
+            if user_id in comment['liked_by']:
                 comment['likes'] -= 1
-                comment['liked_by'].remove(user_ip)
+                comment['liked_by'].remove(user_id)
+                is_liked = False
             else:
                 comment['likes'] += 1
-                comment['liked_by'].append(user_ip)
+                comment['liked_by'].append(user_id)
+                is_liked = True
                 
             save_posts(posts)
-            return jsonify({'success': True, 'likes': comment['likes'], 'is_liked': user_ip in comment['liked_by']})
+            response = jsonify({
+                'success': True, 
+                'likes': comment['likes'], 
+                'is_liked': is_liked
+            })
+            
+            # Cookie'yi ayarla
+            response.set_cookie('user_id', user_id, max_age=31536000)  # 1 yıl
+            return response
                 
     return jsonify({'success': False, 'message': 'Comment not found'}), 404
 
 # Belirli bir gönderiye like ekleme/kaldırma rotası
 @app.route('/like_post/<int:post_id>', methods=['POST'])
 def like_post(post_id):
-    user_ip = request.remote_addr
+    user_id = get_or_create_user_id()
     posts = load_posts()
     post = next((p for p in posts if p['id'] == post_id), None)
     
@@ -167,20 +196,30 @@ def like_post(post_id):
         if 'likes' not in post:
             post['likes'] = 0
             
-        if user_ip in post['liked_by']:
+        if user_id in post['liked_by']:
             post['likes'] -= 1
-            post['liked_by'].remove(user_ip)
+            post['liked_by'].remove(user_id)
+            is_liked = False
         else:
             post['likes'] += 1
-            post['liked_by'].append(user_ip)
+            post['liked_by'].append(user_id)
+            is_liked = True
             
         save_posts(posts)
-        return jsonify({'success': True, 'likes': post['likes'], 'is_liked': user_ip in post['liked_by']})
+        response = jsonify({
+            'success': True, 
+            'likes': post['likes'], 
+            'is_liked': is_liked
+        })
+        
+        # Cookie'yi ayarla
+        response.set_cookie('user_id', user_id, max_age=31536000)  # 1 yıl
+        return response
     
     return jsonify({'success': False, 'message': 'Post not found'}), 404
 
 # Uygulamanın ana giriş noktası
 # Bu işlev, Flask uygulamasını geliştirme modunda çalıştırır.
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host='0.0.0.0', port=port)
